@@ -21,10 +21,24 @@ export async function GET(req) {
     if (category) {
       const { data: cat } = await supabase
         .from('categories')
-        .select('id')
+        .select('id, parent_id')
         .eq('slug', category)
         .maybeSingle()
-      if (cat) query = query.eq('category_id', cat.id)
+
+      if (cat) {
+        if (!cat.parent_id) {
+          // Main category: include products from it AND all its subcategories
+          const { data: subs } = await supabase
+            .from('categories')
+            .select('id')
+            .eq('parent_id', cat.id)
+          const ids = [cat.id, ...(subs?.map((s) => s.id) || [])]
+          query = query.in('category_id', ids)
+        } else {
+          // Subcategory: exact match only
+          query = query.eq('category_id', cat.id)
+        }
+      }
     }
 
     if (search) {
