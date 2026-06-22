@@ -66,14 +66,14 @@ export default function BrandPage() {
       <section id="founder" className="bg-dark text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-24">
           <p className="text-xs tracking-[0.4em] uppercase text-white/50 mb-4">A Message</p>
-          <h2 className="font-display text-5xl font-light mb-8">Founders&apos; Note</h2>
+          <h2 className="font-display text-5xl font-light mb-8">asainternational&apos;s Note</h2>
           <blockquote className="font-display text-2xl font-light italic leading-relaxed text-white/90 mb-8 border-l-2 border-primary pl-6">
             &ldquo;We started BanobagiNepal because we witnessed firsthand the transformative power of Korean medical beauty — not just on skin, but on confidence. Every person deserves to feel at home in their skin.&rdquo;
           </blockquote>
           <p className="text-sm text-white/60 leading-relaxed max-w-2xl">
             After years of experiencing Korean skincare personally and seeing its impact on dermatology patients, we decided to build a bridge — bringing the best of Seoul&apos;s medical beauty district directly to Nepal. BanobagiNepal is more than a shop; it is our commitment to your skin&apos;s long-term health.
           </p>
-          <p className="text-sm text-white/40 mt-6 tracking-widest uppercase">— Founders, BanobagiNepal</p>
+          <p className="text-sm text-white/40 mt-6 tracking-widest uppercase">— asainternational, BanobagiNepal</p>
         </div>
       </section>
 
