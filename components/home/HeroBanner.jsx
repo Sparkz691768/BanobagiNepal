@@ -2,25 +2,29 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { FiArrowRight } from 'react-icons/fi'
 
 const slides = [
   {
-    bg: 'bg-gradient-to-br from-slate-800 to-slate-900',
-    headline: 'Korean Medical Beauty',
-    subheadline: 'Clinically Formulated, Dermatologist Approved',
+    bg: 'from-slate-900 via-slate-800 to-slate-900',
+    eyebrow: 'New Arrivals',
+    headline: 'Korean Medical\nBeauty',
+    subheadline: 'Clinically Formulated · Dermatologist Approved',
     cta: 'Explore Collection',
     href: '/shop',
   },
   {
-    bg: 'bg-gradient-to-br from-primary/90 to-dark',
-    headline: 'Radiant Skin Awaits',
+    bg: 'from-[#0f2744] via-primary to-[#0f2744]',
+    eyebrow: 'Best Sellers',
+    headline: 'Radiant Skin\nAwaits',
     subheadline: "Science-backed formulas from Korea's leading labs",
     cta: 'Shop Serums',
     href: '/shop?category=serum',
   },
   {
-    bg: 'bg-gradient-to-br from-body to-slate-800',
-    headline: 'Protect & Restore',
+    bg: 'from-[#1a1a2e] via-body to-[#1a1a2e]',
+    eyebrow: 'Sun Protection',
+    headline: 'Protect &\nRestore',
     subheadline: 'Advanced suncare and skin barrier solutions',
     cta: 'Shop Suncare',
     href: '/shop?category=suncare',
@@ -29,54 +33,94 @@ const slides = [
 
 export default function HeroBanner() {
   const [current, setCurrent] = useState(0)
+  const [animating, setAnimating] = useState(false)
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrent((c) => (c + 1) % slides.length)
-    }, 5000)
+      setAnimating(true)
+      setTimeout(() => {
+        setCurrent((c) => (c + 1) % slides.length)
+        setAnimating(false)
+      }, 300)
+    }, 5500)
     return () => clearInterval(timer)
   }, [])
+
+  function goTo(i) {
+    if (i === current) return
+    setAnimating(true)
+    setTimeout(() => { setCurrent(i); setAnimating(false) }, 300)
+  }
 
   const slide = slides[current]
 
   return (
-    <section className={`${slide.bg} relative flex items-center justify-center transition-all duration-1000`} style={{ minHeight: '100svh' }}>
-      <div className="absolute inset-0 bg-black/30" />
-      <div className="relative z-10 text-center text-white max-w-3xl mx-auto px-4">
-        <p className="text-xs tracking-[0.4em] uppercase text-white/70 mb-4 font-sans">
-          BanobagiNepal
-        </p>
-        <h1 className="font-display text-5xl sm:text-7xl font-light leading-tight mb-6">
+    <section
+      className={`bg-gradient-to-br ${slide.bg} relative flex items-center justify-center transition-all duration-700`}
+      style={{ minHeight: '100svh' }}
+    >
+      {/* Subtle grain overlay */}
+      <div className="absolute inset-0 opacity-[0.03] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjY1IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMSIvPjwvc3ZnPg==')]" />
+
+      <div
+        className={`relative z-10 text-center text-white max-w-4xl mx-auto px-6 transition-all duration-300 ${
+          animating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
+        }`}
+      >
+        {/* Eyebrow */}
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <span className="w-8 h-px bg-white/40" />
+          <p className="text-[11px] tracking-[0.45em] uppercase text-white/60 font-sans">
+            {slide.eyebrow}
+          </p>
+          <span className="w-8 h-px bg-white/40" />
+        </div>
+
+        {/* Headline */}
+        <h1 className="font-display text-6xl sm:text-8xl font-light leading-[1.05] mb-6 whitespace-pre-line">
           {slide.headline}
         </h1>
-        <p className="text-base sm:text-lg text-white/80 mb-10 font-sans font-light tracking-wide">
+
+        {/* Subheadline */}
+        <p className="text-sm sm:text-base text-white/60 mb-12 font-sans font-light tracking-[0.15em] uppercase">
           {slide.subheadline}
         </p>
+
+        {/* CTA */}
         <Link
           href={slide.href}
-          className="inline-block btn-primary bg-white text-dark hover:bg-light-fill hover:text-primary px-10 py-4"
+          className="group inline-flex items-center gap-3 border border-white/30 text-white text-xs font-semibold tracking-[0.2em] uppercase px-10 py-4 hover:bg-white hover:text-dark transition-all duration-300"
         >
           {slide.cta}
+          <FiArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-200" />
         </Link>
       </div>
 
-      {/* Slide counter */}
-      <div className="absolute bottom-8 right-8 text-white/60 font-sans text-sm tracking-widest">
-        {String(current + 1).padStart(2, '0')}&nbsp;/&nbsp;{String(slides.length).padStart(2, '0')}
+      {/* Slide number */}
+      <div className="absolute bottom-10 right-10 text-white/30 font-sans text-xs tracking-[0.3em]">
+        {String(current + 1).padStart(2, '0')}&nbsp;—&nbsp;{String(slides.length).padStart(2, '0')}
       </div>
 
       {/* Dots */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3">
         {slides.map((_, i) => (
           <button
             key={i}
             type="button"
-            onClick={() => setCurrent(i)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              i === current ? 'bg-white w-6' : 'bg-white/40'
+            onClick={() => goTo(i)}
+            className={`rounded-full transition-all duration-500 ${
+              i === current ? 'bg-white w-6 h-1.5' : 'bg-white/30 w-1.5 h-1.5 hover:bg-white/60'
             }`}
           />
         ))}
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-10 left-10 hidden sm:flex flex-col items-center gap-2 text-white/30">
+        <span className="text-[10px] tracking-[0.3em] uppercase" style={{ writingMode: 'vertical-rl' }}>Scroll</span>
+        <div className="w-px h-8 bg-white/20 relative overflow-hidden">
+          <div className="absolute top-0 w-full bg-white/60 h-1/2 animate-[slideDown_1.5s_ease-in-out_infinite]" />
+        </div>
       </div>
     </section>
   )

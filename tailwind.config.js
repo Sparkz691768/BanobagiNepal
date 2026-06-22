@@ -20,6 +20,15 @@ module.exports = {
         display: ['"Cormorant Garamond"', 'serif'],
         sans: ['Inter', 'sans-serif'],
       },
+      keyframes: {
+        slideDown: {
+          '0%': { transform: 'translateY(-100%)' },
+          '100%': { transform: 'translateY(200%)' },
+        },
+      },
+      animation: {
+        slideDown: 'slideDown 1.5s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

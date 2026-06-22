@@ -69,34 +69,34 @@ a,
 
 @layer components {
   .nav-link {
-    @apply relative text-body text-sm font-medium tracking-wide transition-colors hover:text-primary;
-    /* touch target */
+    @apply relative text-body text-sm font-medium tracking-wide transition-colors duration-200 hover:text-primary;
     min-height: 44px;
     display: inline-flex;
     align-items: center;
   }
   .nav-link::after {
     content: '';
-    @apply absolute left-0 bottom-0 w-0 h-px bg-primary transition-all duration-300;
+    @apply absolute left-0 -bottom-0.5 w-0 h-px bg-primary transition-all duration-300;
   }
   .nav-link:hover::after {
     @apply w-full;
   }
 
   .btn-primary {
-    @apply bg-primary text-white text-xs font-semibold tracking-widest uppercase px-6 py-3
-           transition-colors hover:bg-accent focus:outline-none
-           active:scale-95;
+    @apply bg-primary text-white text-xs font-semibold tracking-[0.15em] uppercase px-8 py-3.5
+           transition-all duration-200 hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary/30
+           active:scale-[0.98];
     min-height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    letter-spacing: 0.12em;
   }
 
   .btn-outline {
-    @apply border border-primary text-primary text-xs font-semibold tracking-widest uppercase px-6 py-3
-           transition-colors hover:bg-primary hover:text-white focus:outline-none
-           active:scale-95;
+    @apply border border-primary text-primary text-xs font-semibold tracking-[0.15em] uppercase px-8 py-3.5
+           transition-all duration-200 hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/30
+           active:scale-[0.98];
     min-height: 44px;
     display: inline-flex;
     align-items: center;
@@ -104,26 +104,33 @@ a,
   }
 
   .btn-dark {
-    @apply bg-dark text-white text-xs font-semibold tracking-widest uppercase px-6 py-3
-           transition-colors hover:bg-body focus:outline-none
-           active:scale-95;
+    @apply bg-dark text-white text-xs font-semibold tracking-[0.15em] uppercase px-8 py-3.5
+           transition-all duration-200 hover:bg-body focus:outline-none focus:ring-2 focus:ring-dark/20
+           active:scale-[0.98];
     min-height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
   }
 
-  /* iOS-safe input: font-size handled above globally */
   .input-field {
     @apply w-full border border-gray-200 px-4 py-3 text-body bg-white
-           focus:outline-none focus:border-primary transition-colors;
-    /* Prevent iOS rounding */
+           focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20
+           transition-all duration-200 placeholder:text-gray-400;
     -webkit-appearance: none;
     border-radius: 0;
   }
 
   .card-shadow {
-    @apply shadow-sm hover:shadow-md transition-shadow;
+    @apply shadow-sm hover:shadow-lg transition-shadow duration-300;
+  }
+
+  .section-label {
+    @apply text-[11px] tracking-[0.4em] uppercase text-muted;
+  }
+
+  .section-title {
+    @apply font-display text-4xl sm:text-5xl font-light text-dark;
   }
 }
 

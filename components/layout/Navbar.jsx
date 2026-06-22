@@ -6,6 +6,8 @@ import { useSession, signOut } from 'next-auth/react'
 import { FiShoppingBag, FiUser, FiMenu, FiX, FiChevronDown, FiPackage } from 'react-icons/fi'
 import useCart from '@/hooks/useCart'
 
+const toTitleCase = (str) => str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+
 const brandLinks = [
   { label: 'Brand Story', href: '/brand#story' },
   { label: 'Our Philosophy', href: '/brand#philosophy' },
@@ -74,24 +76,25 @@ export default function Navbar() {
                 Shop <FiChevronDown size={14} />
               </button>
               {shopOpen && (
-                <div className="absolute top-full left-0 w-56 bg-white shadow-lg border border-gray-100 py-2 z-50">
+                <div className="absolute top-full left-0 w-60 bg-white shadow-xl border border-gray-100 py-3 z-50 rounded-sm">
                   <Link
                     href="/shop"
-                    className="block px-4 py-2 text-sm font-medium text-primary hover:bg-light-fill transition-colors"
+                    className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-primary hover:bg-light-fill transition-colors"
                     onClick={() => setShopOpen(false)}
                   >
+                    <span className="w-1 h-4 bg-primary rounded-full inline-block" />
                     All Products
                   </Link>
                   {categories.length > 0 && (
-                    <div className="border-t border-gray-100 mt-1 pt-1">
+                    <div className="border-t border-gray-100 mt-2 pt-2">
                       {categories.map((c) => (
                         <Link
                           key={c.id}
                           href={`/shop?category=${c.slug}`}
-                          className="block px-4 py-2 text-sm text-body hover:bg-light-fill hover:text-primary transition-colors"
+                          className="block px-5 py-2 text-sm text-body hover:text-primary hover:pl-6 transition-all duration-150"
                           onClick={() => setShopOpen(false)}
                         >
-                          {c.name}
+                          {toTitleCase(c.name)}
                         </Link>
                       ))}
                     </div>
@@ -110,12 +113,12 @@ export default function Navbar() {
                 Brand <FiChevronDown size={14} />
               </button>
               {brandOpen && (
-                <div className="absolute top-full left-0 w-48 bg-white shadow-lg border border-gray-100 py-2 z-50">
+                <div className="absolute top-full left-0 w-52 bg-white shadow-xl border border-gray-100 py-3 z-50 rounded-sm">
                   {brandLinks.map((bl) => (
                     <Link
                       key={bl.href}
                       href={bl.href}
-                      className="block px-4 py-2 text-sm text-body hover:bg-light-fill hover:text-primary transition-colors"
+                      className="block px-5 py-2 text-sm text-body hover:text-primary hover:pl-6 transition-all duration-150"
                     >
                       {bl.label}
                     </Link>
@@ -243,10 +246,10 @@ export default function Navbar() {
               <Link
                 key={c.id}
                 href={`/shop?category=${c.slug}`}
-                className="text-muted text-sm py-2.5 pl-3 border-b border-gray-50 border-l-2 border-l-gray-100 hover:text-primary transition-colors"
+                className="text-muted text-sm py-2.5 pl-4 border-b border-gray-50 border-l-2 border-l-primary/20 hover:text-primary hover:border-l-primary transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
-                {c.name}
+                {toTitleCase(c.name)}
               </Link>
             ))}
 
