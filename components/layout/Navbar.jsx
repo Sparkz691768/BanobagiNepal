@@ -83,66 +83,62 @@ export default function Navbar() {
                 Shop <FiChevronDown size={14} />
               </button>
               {shopOpen && (
-                <div className="absolute top-full left-0 z-50 bg-white shadow-2xl border border-gray-100"
-                  style={{ minWidth: mainCategories.length > 0 ? `${Math.min(mainCategories.length, 4) * 180}px` : '220px' }}
-                >
-                  {/* All Products link */}
-                  <div className="px-6 py-3 border-b border-gray-100">
+                <div className="absolute top-full left-0 z-50 bg-white shadow-2xl border border-gray-100 w-64 max-h-[70vh] overflow-y-auto">
+                  {/* All Products */}
+                  <div className="px-5 py-3 border-b border-gray-100">
                     <Link
                       href="/shop"
                       className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-accent transition-colors"
                       onClick={() => setShopOpen(false)}
                     >
-                      <span className="w-1 h-4 bg-primary rounded-full inline-block" />
+                      <span className="w-1 h-4 bg-primary rounded-full inline-block flex-shrink-0" />
                       All Products
                     </Link>
                   </div>
 
-                  {mainCategories.length > 0 ? (
-                    /* Mega menu columns */
-                    <div className={`grid py-5 px-6 gap-x-8 gap-y-1`}
-                      style={{ gridTemplateColumns: `repeat(${Math.min(mainCategories.length, 4)}, minmax(160px, 1fr))` }}
-                    >
-                      {mainCategories.map((cat) => {
-                        const subs = getSubsFor(cat.id)
-                        return (
-                          <div key={cat.id} className="min-w-0">
+                  {/* Main categories with subcategories */}
+                  <div className="py-2">
+                    {mainCategories.map((cat, idx) => {
+                      const subs = getSubsFor(cat.id)
+                      return (
+                        <div key={cat.id}>
+                          {idx > 0 && <div className="mx-5 border-t border-gray-50 my-1" />}
+                          {/* Main category */}
+                          <Link
+                            href={`/shop?category=${cat.slug}`}
+                            className="flex items-center gap-2 px-5 py-2 text-xs font-semibold tracking-[0.12em] uppercase text-dark hover:text-primary transition-colors"
+                            onClick={() => setShopOpen(false)}
+                          >
+                            {toTitleCase(cat.name)}
+                          </Link>
+                          {/* Subcategories */}
+                          {subs.map((sub) => (
                             <Link
-                              href={`/shop?category=${cat.slug}`}
-                              className="block text-xs font-semibold tracking-[0.15em] uppercase text-dark hover:text-primary transition-colors mb-2"
+                              key={sub.id}
+                              href={`/shop?category=${sub.slug}`}
+                              className="flex items-center gap-2 px-5 pl-8 py-1.5 text-sm text-muted hover:text-primary hover:bg-light-fill transition-colors"
                               onClick={() => setShopOpen(false)}
                             >
-                              {toTitleCase(cat.name)}
+                              <span className="w-1 h-1 rounded-full bg-gray-300 flex-shrink-0" />
+                              {toTitleCase(sub.name)}
                             </Link>
-                            {subs.map((sub) => (
-                              <Link
-                                key={sub.id}
-                                href={`/shop?category=${sub.slug}`}
-                                className="block text-sm text-muted hover:text-primary transition-colors py-1 truncate"
-                                onClick={() => setShopOpen(false)}
-                              >
-                                {toTitleCase(sub.name)}
-                              </Link>
-                            ))}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  ) : (
-                    /* Fallback: flat list when no parent categories set */
-                    <div className="py-3">
-                      {categories.map((c) => (
-                        <Link
-                          key={c.id}
-                          href={`/shop?category=${c.slug}`}
-                          className="block px-6 py-2 text-sm text-body hover:text-primary hover:bg-light-fill transition-colors"
-                          onClick={() => setShopOpen(false)}
-                        >
-                          {toTitleCase(c.name)}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
+                          ))}
+                        </div>
+                      )
+                    })}
+
+                    {/* Fallback when no hierarchy set */}
+                    {mainCategories.length === 0 && categories.map((c) => (
+                      <Link
+                        key={c.id}
+                        href={`/shop?category=${c.slug}`}
+                        className="block px-5 py-2 text-sm text-body hover:text-primary hover:bg-light-fill transition-colors"
+                        onClick={() => setShopOpen(false)}
+                      >
+                        {toTitleCase(c.name)}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
