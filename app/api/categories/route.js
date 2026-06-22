@@ -24,13 +24,13 @@ export async function POST(req) {
     if (!session || session.user.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const { name } = await req.json()
+    const { name, parent_id } = await req.json()
     if (!name) return NextResponse.json({ error: 'Name required' }, { status: 400 })
 
     const supabase = createServiceClient()
     const { data, error } = await supabase
       .from('categories')
-      .insert({ name, slug: slugify(name) })
+      .insert({ name, slug: slugify(name), parent_id: parent_id || null })
       .select()
       .single()
 

@@ -36,8 +36,15 @@ export default function Navbar() {
   useEffect(() => {
     fetch('/api/categories')
       .then((r) => r.json())
-      .then((data) => { if (Array.isArray(data)) setCategories(data) })
+      .then((data) => {
+        if (!Array.isArray(data)) return
+        setCategories(data)
+      })
   }, [])
+
+  // Build tree: main categories with their subcategories
+  const mainCategories = categories.filter((c) => !c.parent_id)
+  const getSubsFor = (id) => categories.filter((c) => c.parent_id === id)
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
@@ -66,7 +73,7 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-8">
-            {/* Shop dropdown */}
+            {/* Shop mega menu */}
             <div
               className="relative"
               onMouseEnter={() => setShopOpen(true)}
@@ -76,22 +83,59 @@ export default function Navbar() {
                 Shop <FiChevronDown size={14} />
               </button>
               {shopOpen && (
-                <div className="absolute top-full left-0 w-60 bg-white shadow-xl border border-gray-100 py-3 z-50 rounded-sm">
-                  <Link
-                    href="/shop"
-                    className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-primary hover:bg-light-fill transition-colors"
-                    onClick={() => setShopOpen(false)}
-                  >
-                    <span className="w-1 h-4 bg-primary rounded-full inline-block" />
-                    All Products
-                  </Link>
-                  {categories.length > 0 && (
-                    <div className="border-t border-gray-100 mt-2 pt-2">
+                <div className="absolute top-full left-0 z-50 bg-white shadow-2xl border border-gray-100"
+                  style={{ minWidth: mainCategories.length > 0 ? `${Math.min(mainCategories.length, 4) * 180}px` : '220px' }}
+                >
+                  {/* All Products link */}
+                  <div className="px-6 py-3 border-b border-gray-100">
+                    <Link
+                      href="/shop"
+                      className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-accent transition-colors"
+                      onClick={() => setShopOpen(false)}
+                    >
+                      <span className="w-1 h-4 bg-primary rounded-full inline-block" />
+                      All Products
+                    </Link>
+                  </div>
+
+                  {mainCategories.length > 0 ? (
+                    /* Mega menu columns */
+                    <div className={`grid py-5 px-6 gap-x-8 gap-y-1`}
+                      style={{ gridTemplateColumns: `repeat(${Math.min(mainCategories.length, 4)}, minmax(160px, 1fr))` }}
+                    >
+                      {mainCategories.map((cat) => {
+                        const subs = getSubsFor(cat.id)
+                        return (
+                          <div key={cat.id} className="min-w-0">
+                            <Link
+                              href={`/shop?category=${cat.slug}`}
+                              className="block text-xs font-semibold tracking-[0.15em] uppercase text-dark hover:text-primary transition-colors mb-2"
+                              onClick={() => setShopOpen(false)}
+                            >
+                              {toTitleCase(cat.name)}
+                            </Link>
+                            {subs.map((sub) => (
+                              <Link
+                                key={sub.id}
+                                href={`/shop?category=${sub.slug}`}
+                                className="block text-sm text-muted hover:text-primary transition-colors py-1 truncate"
+                                onClick={() => setShopOpen(false)}
+                              >
+                                {toTitleCase(sub.name)}
+                              </Link>
+                            ))}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ) : (
+                    /* Fallback: flat list when no parent categories set */
+                    <div className="py-3">
                       {categories.map((c) => (
                         <Link
                           key={c.id}
                           href={`/shop?category=${c.slug}`}
-                          className="block px-5 py-2 text-sm text-body hover:text-primary hover:pl-6 transition-all duration-150"
+                          className="block px-6 py-2 text-sm text-body hover:text-primary hover:bg-light-fill transition-colors"
                           onClick={() => setShopOpen(false)}
                         >
                           {toTitleCase(c.name)}
@@ -239,14 +283,39 @@ export default function Navbar() {
         {menuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-100 px-4 py-2 flex flex-col">
             {/* Shop with categories */}
-            <Link href="/shop" className="text-body text-sm font-medium py-3 border-b border-gray-50" onClick={() => setMenuOpen(false)}>
+            <Link href="/shop" className="text-body text-sm font-semibold py-3 border-b border-gray-100" onClick={() => setMenuOpen(false)}>
               All Products
             </Link>
-            {categories.map((c) => (
+            {mainCategories.map((cat) => {
+              const subs = getSubsFor(cat.id)
+              return (
+                <div key={cat.id}>
+                  <Link
+                    href={`/shop?category=${cat.slug}`}
+                    className="block text-body text-sm font-medium py-3 border-b border-gray-50 hover:text-primary transition-colors"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {toTitleCase(cat.name)}
+                  </Link>
+                  {subs.map((sub) => (
+                    <Link
+                      key={sub.id}
+                      href={`/shop?category=${sub.slug}`}
+                      className="block text-muted text-sm py-2 pl-5 border-b border-gray-50 border-l-2 border-l-primary/20 hover:text-primary hover:border-l-primary transition-colors"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {toTitleCase(sub.name)}
+                    </Link>
+                  ))}
+                </div>
+              )
+            })}
+            {/* Fallback: show flat list when no parent categories exist */}
+            {mainCategories.length === 0 && categories.map((c) => (
               <Link
                 key={c.id}
                 href={`/shop?category=${c.slug}`}
-                className="text-muted text-sm py-2.5 pl-4 border-b border-gray-50 border-l-2 border-l-primary/20 hover:text-primary hover:border-l-primary transition-colors"
+                className="text-muted text-sm py-2.5 pl-4 border-b border-gray-50 border-l-2 border-l-primary/20 hover:text-primary transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
                 {toTitleCase(c.name)}
