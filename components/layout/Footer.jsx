@@ -1,5 +1,12 @@
 import Link from 'next/link'
+import { FaInstagram, FaFacebook, FaTiktok } from 'react-icons/fa'
 import NewsletterForm from './NewsletterForm'
+
+const SOCIAL_LINKS = [
+  { icon: FaInstagram, href: 'https://www.instagram.com/banobagiofficialnepal', label: 'Instagram' },
+  { icon: FaFacebook, href: 'https://www.facebook.com/profile.php?id=61586055162580', label: 'Facebook' },
+  { icon: FaTiktok, href: 'https://www.tiktok.com/@banobagiofficialinnepal', label: 'TikTok' },
+]
 
 export default function Footer() {
   return (
@@ -16,9 +23,24 @@ export default function Footer() {
                 Korean Beauty
               </span>
             </Link>
-            <p className="text-sm text-gray-400 leading-relaxed">
+            <p className="text-sm text-gray-400 leading-relaxed mb-5">
               Authentic Korean medical-grade beauty products, carefully curated for the Nepali market.
             </p>
+            {/* Social Icons */}
+            <div className="flex items-center gap-4">
+              {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <Icon size={20} />
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* Shop */}
@@ -66,6 +88,11 @@ export default function Footer() {
                   Our Story
                 </Link>
               </li>
+              <li>
+                <Link href="/contact" className="text-sm text-gray-300 hover:text-white transition-colors">
+                  Contact Us
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -85,6 +112,20 @@ export default function Footer() {
           <p className="text-xs text-gray-500">
             © {new Date().getFullYear()} BanobagiNepal. All rights reserved.
           </p>
+          <div className="flex items-center gap-5">
+            {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="text-gray-500 hover:text-white transition-colors"
+              >
+                <Icon size={16} />
+              </a>
+            ))}
+          </div>
           <p className="text-xs text-gray-500">
             Authentic Korean Beauty · Nepal
           </p>

@@ -23,6 +23,7 @@ export default function Navbar() {
   const [brandOpen, setBrandOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
   const [categories, setCategories] = useState([])
+  const [shopOpen, setShopOpen] = useState(false)
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 10)
@@ -63,12 +64,41 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-8">
-            <Link href="/shop" className="nav-link">Shop</Link>
-            {categories.map((c) => (
-              <Link key={c.id} href={`/shop?category=${c.slug}`} className="nav-link">
-                {c.name}
-              </Link>
-            ))}
+            {/* Shop dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setShopOpen(true)}
+              onMouseLeave={() => setShopOpen(false)}
+            >
+              <button className="nav-link flex items-center gap-1" type="button">
+                Shop <FiChevronDown size={14} />
+              </button>
+              {shopOpen && (
+                <div className="absolute top-full left-0 w-56 bg-white shadow-lg border border-gray-100 py-2 z-50">
+                  <Link
+                    href="/shop"
+                    className="block px-4 py-2 text-sm font-medium text-primary hover:bg-light-fill transition-colors"
+                    onClick={() => setShopOpen(false)}
+                  >
+                    All Products
+                  </Link>
+                  {categories.length > 0 && (
+                    <div className="border-t border-gray-100 mt-1 pt-1">
+                      {categories.map((c) => (
+                        <Link
+                          key={c.id}
+                          href={`/shop?category=${c.slug}`}
+                          className="block px-4 py-2 text-sm text-body hover:bg-light-fill hover:text-primary transition-colors"
+                          onClick={() => setShopOpen(false)}
+                        >
+                          {c.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Brand dropdown */}
             <div
@@ -94,9 +124,8 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link href="/about" className="nav-link">
-              Our Story
-            </Link>
+            <Link href="/about" className="nav-link">Our Story</Link>
+            <Link href="/contact" className="nav-link">Contact</Link>
           </div>
 
           {/* Right icons */}
@@ -206,15 +235,15 @@ export default function Navbar() {
         {/* Mobile menu */}
         {menuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-100 px-4 py-2 flex flex-col">
-            {/* Shop links */}
+            {/* Shop with categories */}
             <Link href="/shop" className="text-body text-sm font-medium py-3 border-b border-gray-50" onClick={() => setMenuOpen(false)}>
-              Shop
+              All Products
             </Link>
             {categories.map((c) => (
               <Link
                 key={c.id}
                 href={`/shop?category=${c.slug}`}
-                className="text-body text-sm font-medium py-3 border-b border-gray-50"
+                className="text-muted text-sm py-2.5 pl-3 border-b border-gray-50 border-l-2 border-l-gray-100 hover:text-primary transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
                 {c.name}
@@ -235,6 +264,9 @@ export default function Navbar() {
             ))}
             <Link href="/about" className="text-body text-sm font-medium py-3 border-b border-gray-50" onClick={() => setMenuOpen(false)}>
               Our Story
+            </Link>
+            <Link href="/contact" className="text-body text-sm font-medium py-3 border-b border-gray-50" onClick={() => setMenuOpen(false)}>
+              Contact
             </Link>
 
             {/* Account shortcuts */}
