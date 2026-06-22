@@ -52,10 +52,8 @@ select {
 
 /* ── Minimum touch target 44×44px for accessibility ── */
 button,
-a,
 [role="button"] {
   min-height: 44px;
-  min-width: 44px;
 }
 
 /* Override for purely decorative/icon-only elements that have padding already */
