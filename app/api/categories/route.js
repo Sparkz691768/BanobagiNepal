@@ -41,6 +41,30 @@ export async function POST(req) {
   }
 }
 
+export async function PATCH(req) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session || session.user.role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const { id, name } = await req.json()
+    if (!id || !name) return NextResponse.json({ error: 'ID and name required' }, { status: 400 })
+
+    const supabase = createServiceClient()
+    const { data, error } = await supabase
+      .from('categories')
+      .update({ name, slug: slugify(name) })
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
+    return NextResponse.json(data)
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
+}
+
 export async function DELETE(req) {
   try {
     const session = await getServerSession(authOptions)

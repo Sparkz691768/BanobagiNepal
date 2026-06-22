@@ -26,6 +26,7 @@ export default function Navbar() {
   const [userOpen, setUserOpen] = useState(false)
   const [categories, setCategories] = useState([])
   const [shopOpen, setShopOpen] = useState(false)
+  const [announcement, setAnnouncement] = useState('Free shipping on orders over Rs. 2,000  ·  Authentic Korean Beauty')
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 10)
@@ -36,10 +37,14 @@ export default function Navbar() {
   useEffect(() => {
     fetch('/api/categories')
       .then((r) => r.json())
-      .then((data) => {
-        if (!Array.isArray(data)) return
-        setCategories(data)
-      })
+      .then((data) => { if (Array.isArray(data)) setCategories(data) })
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((d) => { if (d.announcement) setAnnouncement(d.announcement) })
+      .catch(() => {})
   }, [])
 
   // Build tree: main categories with their subcategories
@@ -50,8 +55,7 @@ export default function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50">
       {/* Announcement bar */}
       <div className="bg-primary text-white text-center text-xs py-2 tracking-widest uppercase font-medium px-4">
-        <span className="hidden sm:inline">Free shipping on orders over Rs. 2,000 &nbsp;·&nbsp; Authentic Korean Beauty</span>
-        <span className="sm:hidden">Free shipping over Rs. 2,000</span>
+        {announcement}
       </div>
 
       {/* Main nav */}

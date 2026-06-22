@@ -10,6 +10,7 @@ import {
   FiTag,
   FiUsers,
   FiChevronRight,
+  FiSettings,
 } from 'react-icons/fi'
 
 const navItems = [
@@ -18,6 +19,7 @@ const navItems = [
   { label: 'Products', href: '/admin/products', icon: FiPackage },
   { label: 'Categories', href: '/admin/categories', icon: FiTag },
   { label: 'Employees', href: '/admin/employees', icon: FiUsers, adminOnly: true },
+  { label: 'Settings', href: '/admin/settings', icon: FiSettings, adminOnly: true },
 ]
 
 export default function AdminLayout({ children }) {
