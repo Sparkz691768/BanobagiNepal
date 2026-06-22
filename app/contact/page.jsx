@@ -86,10 +86,10 @@ export default function ContactPage() {
                 <div>
                   <p className="text-sm font-semibold text-dark mb-0.5">Email</p>
                   <a
-                    href="mailto:kharelbinaya@gmail.com"
+                    href="mailto:asainternational260328@gmail.com"
                     className="text-sm text-muted hover:text-primary transition-colors"
                   >
-                    kharelbinaya@gmail.com
+                    asainternational260328@gmail.com
                   </a>
                 </div>
               </div>
@@ -110,6 +110,22 @@ export default function ContactPage() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* PR & Collaboration */}
+          <div className="bg-white border border-gray-200 p-6">
+            <p className="text-xs font-semibold tracking-widest uppercase text-muted mb-2">
+              PR &amp; Collaboration
+            </p>
+            <p className="text-sm text-body leading-relaxed mb-3">
+              Interested in collaborating with us? Whether you&apos;re a content creator, influencer, or brand partner — we&apos;d love to connect.
+            </p>
+            <a
+              href="mailto:asainternational260328@gmail.com"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              asainternational260328@gmail.com →
+            </a>
           </div>
 
           {/* Order support note */}
