@@ -1,3 +1,6 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { FaInstagram, FaFacebook, FaTiktok } from 'react-icons/fa'
 import NewsletterForm from './NewsletterForm'
@@ -8,7 +11,22 @@ const SOCIAL_LINKS = [
   { icon: FaTiktok, href: 'https://www.tiktok.com/@banobagiofficialinnepal', label: 'TikTok' },
 ]
 
+const toTitleCase = (str) => str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+
 export default function Footer() {
+  const [categories, setCategories] = useState([])
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then((r) => r.json())
+      .then((d) => setCategories(Array.isArray(d) ? d : []))
+      .catch(() => {})
+  }, [])
+
+  // Show subcategories if hierarchy exists, otherwise show all
+  const subCategories = categories.filter((c) => c.parent_id)
+  const shopLinks = subCategories.length > 0 ? subCategories : categories
+
   return (
     <footer className="bg-dark text-white mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
@@ -26,36 +44,34 @@ export default function Footer() {
             <p className="text-sm text-gray-400 leading-relaxed mb-5">
               Authentic Korean medical-grade beauty products, carefully curated for the Nepali market.
             </p>
-            {/* Social Icons */}
             <div className="flex items-center gap-4">
               {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+                  className="text-gray-400 hover:text-white transition-colors">
                   <Icon size={20} />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Shop */}
+          {/* Shop — dynamic from DB */}
           <div>
             <h4 className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-4">
               Shop
             </h4>
             <ul className="space-y-2">
-              {['Cleansing', 'Toners', 'Serums', 'Moisturiser', 'Suncare', 'Face Masks'].map((item) => (
-                <li key={item}>
+              <li>
+                <Link href="/shop" className="text-sm text-gray-300 hover:text-white transition-colors">
+                  All Products
+                </Link>
+              </li>
+              {shopLinks.map((item) => (
+                <li key={item.id}>
                   <Link
-                    href={`/shop?category=${item.toLowerCase()}`}
+                    href={`/shop?category=${item.slug}`}
                     className="text-sm text-gray-300 hover:text-white transition-colors"
                   >
-                    {item}
+                    {toTitleCase(item.name)}
                   </Link>
                 </li>
               ))}
@@ -68,31 +84,11 @@ export default function Footer() {
               Brand
             </h4>
             <ul className="space-y-2">
-              <li>
-                <Link href="/brand#story" className="text-sm text-gray-300 hover:text-white transition-colors">
-                  Brand Story
-                </Link>
-              </li>
-              <li>
-                <Link href="/brand#philosophy" className="text-sm text-gray-300 hover:text-white transition-colors">
-                  Our Philosophy
-                </Link>
-              </li>
-              <li>
-                <Link href="/brand#founder" className="text-sm text-gray-300 hover:text-white transition-colors">
-                  Founder&apos;s Note
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-sm text-gray-300 hover:text-white transition-colors">
-                  Our Story
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-sm text-gray-300 hover:text-white transition-colors">
-                  Contact Us
-                </Link>
-              </li>
+              <li><Link href="/brand#story" className="text-sm text-gray-300 hover:text-white transition-colors">Brand Story</Link></li>
+              <li><Link href="/brand#philosophy" className="text-sm text-gray-300 hover:text-white transition-colors">Our Philosophy</Link></li>
+              <li><Link href="/brand#founder" className="text-sm text-gray-300 hover:text-white transition-colors">Founder&apos;s Note</Link></li>
+              <li><Link href="/about" className="text-sm text-gray-300 hover:text-white transition-colors">Our Story</Link></li>
+              <li><Link href="/contact" className="text-sm text-gray-300 hover:text-white transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 
@@ -114,14 +110,8 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-5">
             {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="text-gray-500 hover:text-white transition-colors"
-              >
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+                className="text-gray-500 hover:text-white transition-colors">
                 <Icon size={16} />
               </a>
             ))}
