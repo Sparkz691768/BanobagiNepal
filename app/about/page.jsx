@@ -1,4 +1,4 @@
-﻿export const metadata = { title: 'Our Story â€” BanobagiNepal' }
+export const metadata = { title: 'Our Story — BanobagiNepal' }
 
 export default function AboutPage() {
   return (
@@ -18,10 +18,10 @@ export default function AboutPage() {
           </div>
           <div className="space-y-4 text-body leading-relaxed">
             <p>
-              Our team understands the unique climate, skin concerns, and beauty culture of Nepal. We bridge the gap between Korean medical science and Nepali beauty needs â€” providing not just products, but education, guidance, and genuine care.
+              Our team understands the unique climate, skin concerns, and beauty culture of Nepal. We bridge the gap between Korean medical science and Nepali beauty needs — providing not just products, but education, guidance, and genuine care.
             </p>
             <p>
-              From Kathmandu to Pokhara, we deliver joy in a bottle â€” one authentic Korean formula at a time.
+              From Kathmandu to Pokhara, we deliver joy in a bottle — one authentic Korean formula at a time.
             </p>
           </div>
         </div>
@@ -29,7 +29,7 @@ export default function AboutPage() {
         <div className="bg-primary text-white p-10 mb-16">
           <h2 className="font-display text-3xl font-light mb-4">Our Mission</h2>
           <p className="text-white/80 leading-relaxed text-lg">
-            To make clinically proven, dermatologist-tested Korean beauty accessible to every person in Nepal â€” with transparency, authenticity, and exceptional service at our core.
+            To make clinically proven, dermatologist-tested Korean beauty accessible to every person in Nepal — with transparency, authenticity, and exceptional service at our core.
           </p>
         </div>
 
@@ -49,4 +49,3 @@ export default function AboutPage() {
     </div>
   )
 }
-

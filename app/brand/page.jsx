@@ -1,4 +1,4 @@
-﻿export const metadata = { title: 'Brand â€” BanobagiNepal' }
+export const metadata = { title: 'Brand — BanobagiNepal' }
 
 export default function BrandPage() {
   return (
@@ -9,10 +9,10 @@ export default function BrandPage() {
         <h1 className="font-display text-5xl font-light text-dark mb-8">Brand Story</h1>
         <div className="prose prose-sm max-w-none text-body leading-relaxed space-y-4">
           <p>
-            Banobagi was born in the heart of Seoul&apos;s medical beauty district â€” a brand forged in the precision of clinical dermatology and the artistry of Korean skin culture. Founded by leading dermatologists and cosmetic scientists, Banobagi has been at the forefront of medical-grade beauty innovation since its inception.
+            Banobagi was born in the heart of Seoul&apos;s medical beauty district — a brand forged in the precision of clinical dermatology and the artistry of Korean skin culture. Founded by leading dermatologists and cosmetic scientists, Banobagi has been at the forefront of medical-grade beauty innovation since its inception.
           </p>
           <p>
-            BanobagiNepal brings this legacy of scientific excellence to the Nepali market. We believe every person deserves access to the most advanced, clinically proven skincare formulations â€” products that have been trusted by millions across Korea and Southeast Asia.
+            BanobagiNepal brings this legacy of scientific excellence to the Nepali market. We believe every person deserves access to the most advanced, clinically proven skincare formulations — products that have been trusted by millions across Korea and Southeast Asia.
           </p>
           <p>
             Our curated collection features the finest from Banobagi&apos;s medical-grade lineup: from targeted serums that penetrate deep into the skin&apos;s layers to barrier-restoring moisturizers and high-protection sunscreens. Each product undergoes rigorous dermatological testing before earning its place in our collection.
@@ -47,7 +47,7 @@ export default function BrandPage() {
             },
             {
               title: 'Skin Integrity',
-              body: 'We believe in enhancing your skin\'s natural intelligence â€” not masking it. Our formulations work with your biology, not against it.'
+              body: "We believe in enhancing your skin's natural intelligence — not masking it. Our formulations work with your biology, not against it."
             },
             {
               title: 'Accessible Excellence',
@@ -62,18 +62,18 @@ export default function BrandPage() {
         </div>
       </section>
 
-      {/* Founder */}
+      {/* Founders */}
       <section id="founder" className="bg-dark text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-24">
           <p className="text-xs tracking-[0.4em] uppercase text-white/50 mb-4">A Message</p>
-          <h2 className="font-display text-5xl font-light mb-8">Founder&apos;s Note</h2>
+          <h2 className="font-display text-5xl font-light mb-8">Founders&apos; Note</h2>
           <blockquote className="font-display text-2xl font-light italic leading-relaxed text-white/90 mb-8 border-l-2 border-primary pl-6">
-            &ldquo;I started BanobagiNepal because I witnessed firsthand the transformative power of Korean medical beauty â€” not just on skin, but on confidence. Every person deserves to feel at home in their skin.&rdquo;
+            &ldquo;We started BanobagiNepal because we witnessed firsthand the transformative power of Korean medical beauty — not just on skin, but on confidence. Every person deserves to feel at home in their skin.&rdquo;
           </blockquote>
           <p className="text-sm text-white/60 leading-relaxed max-w-2xl">
-            After years of experiencing Korean skincare personally and seeing its impact on dermatology patients, we decided to build a bridge â€” bringing the best of Seoul&apos;s medical beauty district directly to Nepal. BanobagiNepal is more than a shop; it is a commitment to your skin&apos;s long-term health.
+            After years of experiencing Korean skincare personally and seeing its impact on dermatology patients, we decided to build a bridge — bringing the best of Seoul&apos;s medical beauty district directly to Nepal. BanobagiNepal is more than a shop; it is our commitment to your skin&apos;s long-term health.
           </p>
-          <p className="text-sm text-white/40 mt-6 tracking-widest uppercase">â€” Founder, BanobagiNepal</p>
+          <p className="text-sm text-white/40 mt-6 tracking-widest uppercase">— Founders, BanobagiNepal</p>
         </div>
       </section>
 
@@ -99,4 +99,3 @@ export default function BrandPage() {
     </div>
   )
 }
-
