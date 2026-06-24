@@ -14,7 +14,7 @@ const slides = [
     href: '/shop',
   },
   {
-    bg: 'from-[#0f2744] via-primary to-[#0f2744]',
+    bg: 'from-[#4F2BB8] via-primary to-[#4F2BB8]',
     eyebrow: 'Best Sellers',
     headline: 'Radiant Skin\nAwaits',
     subheadline: "Science-backed formulas from Korea's leading labs",
@@ -22,7 +22,7 @@ const slides = [
     href: '/shop?category=serum',
   },
   {
-    bg: 'from-[#1a1a2e] via-body to-[#1a1a2e]',
+    bg: 'from-[#4F2BB8] via-accent to-[#4F2BB8]',
     eyebrow: 'Sun Protection',
     headline: 'Protect &\nRestore',
     subheadline: 'Advanced suncare and skin barrier solutions',
