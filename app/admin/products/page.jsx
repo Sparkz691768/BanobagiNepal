@@ -7,9 +7,12 @@ import { formatPrice } from '@/lib/utils'
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiUpload } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 
+const MAX_MAIN_CATEGORIES = 2
+const MAX_SUB_CATEGORIES = 2
+
 const EMPTY_FORM = {
   name: '', description: '', price: '', original_price: '',
-  category_id: '', stock: '', is_featured: false, is_active: true, images: [],
+  category_ids: [], stock: '', is_featured: false, is_active: true, images: [],
 }
 
 export default function AdminProductsPage() {
@@ -49,7 +52,7 @@ export default function AdminProductsPage() {
       description: product.description || '',
       price: product.price || '',
       original_price: product.original_price || '',
-      category_id: product.category_id || '',
+      category_ids: product.category_ids || (product.categories ? product.categories.map((c) => c.id) : []),
       stock: product.stock || '',
       is_featured: product.is_featured || false,
       is_active: product.is_active !== false,
@@ -89,6 +92,12 @@ export default function AdminProductsPage() {
   async function handleSave(e) {
     e.preventDefault()
     if (!form.name || !form.price) { toast.error('Name and price required'); return }
+    const selectedMainCount = mainCategories.filter((c) => form.category_ids.includes(c.id)).length
+    const selectedSubCount = subCategories.filter((c) => form.category_ids.includes(c.id)).length
+    if (selectedMainCount > MAX_MAIN_CATEGORIES || selectedSubCount > MAX_SUB_CATEGORIES) {
+      toast.error(`Choose up to ${MAX_MAIN_CATEGORIES} main categories and ${MAX_SUB_CATEGORIES} subcategories`)
+      return
+    }
     setSaving(true)
     try {
       const payload = {
@@ -129,6 +138,38 @@ export default function AdminProductsPage() {
     }
   }
 
+  const mainCategories = categories.filter((c) => !c.parent_id)
+  const subCategories = categories.filter((c) => c.parent_id)
+  const selectedCategoryNames = categories
+    .filter((c) => form.category_ids.includes(c.id))
+    .map((c) => c.name)
+  const selectedMainCount = mainCategories.filter((c) => form.category_ids.includes(c.id)).length
+  const selectedSubCount = subCategories.filter((c) => form.category_ids.includes(c.id)).length
+
+  function getSubsFor(parentId) {
+    return subCategories.filter((s) => s.parent_id === parentId)
+  }
+
+  function toggleCategory(categoryId) {
+    setForm((current) => {
+      const isSelected = current.category_ids.includes(categoryId)
+      const category = categories.find((c) => c.id === categoryId)
+      const maxForType = category?.parent_id ? MAX_SUB_CATEGORIES : MAX_MAIN_CATEGORIES
+      const selectedForType = categories.filter((c) =>
+        Boolean(c.parent_id) === Boolean(category?.parent_id) && current.category_ids.includes(c.id)
+      ).length
+
+      if (isSelected) {
+        return { ...current, category_ids: current.category_ids.filter((id) => id !== categoryId) }
+      }
+      if (selectedForType >= maxForType) {
+        toast.error(`Only ${maxForType} ${category?.parent_id ? 'subcategories' : 'main categories'} can be selected`)
+        return current
+      }
+      return { ...current, category_ids: [...current.category_ids, categoryId] }
+    })
+  }
+
   if (loading) return <div className="p-8 text-muted">Loading...</div>
 
   return (
@@ -164,7 +205,7 @@ export default function AdminProductsPage() {
                   </div>
                 </td>
                 <td className="px-4 py-3 font-medium text-body max-w-xs truncate">{product.name}</td>
-                <td className="px-4 py-3 text-muted text-xs">{product.categories?.name || '—'}</td>
+                <td className="px-4 py-3 text-muted text-xs">{product.categories?.map(c => c.name).join(', ') || '—'}</td>
                 <td className="px-4 py-3 font-medium text-body">{formatPrice(product.price)}</td>
                 <td className="px-4 py-3 text-muted">{product.stock}</td>
                 <td className="px-4 py-3">
@@ -220,12 +261,78 @@ export default function AdminProductsPage() {
                 <label className="text-xs font-semibold tracking-widest uppercase text-body mb-1 block">Original Price (Rs.)</label>
                 <input className="input-field" type="number" value={form.original_price} onChange={(e) => setForm({ ...form, original_price: e.target.value })} />
               </div>
-              <div>
-                <label className="text-xs font-semibold tracking-widest uppercase text-body mb-1 block">Category</label>
-                <select className="input-field" value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}>
-                  <option value="">Select category</option>
-                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
+              <div className="sm:col-span-2">
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <label className="text-xs font-semibold tracking-widest uppercase text-body block">Categories</label>
+                  <span className="text-[11px] text-muted">
+                    Main {selectedMainCount}/{MAX_MAIN_CATEGORIES} / Sub {selectedSubCount}/{MAX_SUB_CATEGORIES}
+                  </span>
+                </div>
+                <div className="border border-gray-200 bg-gray-50 p-3 max-h-56 overflow-y-auto">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-[11px] font-semibold tracking-widest uppercase text-muted mb-2">Main Categories</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {mainCategories.map((cat) => (
+                          <label key={cat.id} className="flex items-center gap-2 text-sm text-body bg-white border border-gray-100 px-3 py-2">
+                            <input
+                              type="checkbox"
+                              checked={form.category_ids.includes(cat.id)}
+                              onChange={() => toggleCategory(cat.id)}
+                            />
+                            <span className="truncate">{cat.name}</span>
+                          </label>
+                        ))}
+                        {mainCategories.length === 0 && categories.map((cat) => (
+                          <label key={cat.id} className="flex items-center gap-2 text-sm text-body bg-white border border-gray-100 px-3 py-2">
+                            <input
+                              type="checkbox"
+                              checked={form.category_ids.includes(cat.id)}
+                              onChange={() => toggleCategory(cat.id)}
+                            />
+                            <span className="truncate">{cat.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    {subCategories.length > 0 && (
+                      <div>
+                        <p className="text-[11px] font-semibold tracking-widest uppercase text-muted mb-2">Subcategories</p>
+                        <div className="space-y-3">
+                          {mainCategories.map((cat) => {
+                            const subs = getSubsFor(cat.id)
+                            if (subs.length === 0) return null
+                            return (
+                              <div key={cat.id}>
+                                <p className="text-[11px] text-muted mb-2">{cat.name}</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  {subs.map((sub) => (
+                                    <label key={sub.id} className="flex items-center gap-2 text-sm text-body bg-white border border-gray-100 px-3 py-2">
+                                      <input
+                                        type="checkbox"
+                                        checked={form.category_ids.includes(sub.id)}
+                                        onChange={() => toggleCategory(sub.id)}
+                                      />
+                                      <span className="truncate">{sub.name}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {categories.length === 0 && (
+                    <div className="py-4 text-sm text-muted text-center">
+                      No categories yet.
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-muted mt-2">
+                  {selectedCategoryNames.length > 0 ? selectedCategoryNames.join(', ') : 'Categories and subcategories are optional. Products will appear in each selected category.'}
+                </p>
               </div>
               <div>
                 <label className="text-xs font-semibold tracking-widest uppercase text-body mb-1 block">Stock</label>

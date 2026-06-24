@@ -12,12 +12,21 @@ export default async function ProductDetailPage({ params }) {
   const supabase = createServiceClient()
   const { data: product } = await supabase
     .from('products')
-    .select('*, categories(name, slug)')
+    .select('*')
     .eq('slug', params.slug)
     .eq('is_active', true)
     .maybeSingle()
 
   if (!product) notFound()
+
+  // attach categories
+  const catIds = product.category_ids || []
+  if (catIds.length > 0) {
+    const { data: cats } = await supabase.from('categories').select('id, name, slug').in('id', catIds)
+    product.categories = cats || []
+  } else {
+    product.categories = []
+  }
 
   const { data: reviews } = await supabase
     .from('reviews')

@@ -30,7 +30,7 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#1A5C8A',
+  themeColor: '#6C3FE0',
 }
 
 export default function RootLayout({ children }) {

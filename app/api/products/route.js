@@ -4,6 +4,9 @@ import { authOptions } from '@/lib/auth'
 import { createServiceClient } from '@/lib/supabase'
 import { slugify } from '@/lib/utils'
 
+const MAX_MAIN_CATEGORIES = 2
+const MAX_SUB_CATEGORIES = 2
+
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url)
@@ -15,7 +18,7 @@ export async function GET(req) {
     const supabase = createServiceClient()
     let query = supabase
       .from('products')
-      .select('*, categories(name, slug)')
+      .select('*')
       .eq('is_active', true)
 
     if (category) {
@@ -33,10 +36,10 @@ export async function GET(req) {
             .select('id')
             .eq('parent_id', cat.id)
           const ids = [cat.id, ...(subs?.map((s) => s.id) || [])]
-          query = query.in('category_id', ids)
+          query = query.overlaps('category_ids', ids)
         } else {
           // Subcategory: exact match only
-          query = query.eq('category_id', cat.id)
+          query = query.overlaps('category_ids', [cat.id])
         }
       }
     }
@@ -57,7 +60,19 @@ export async function GET(req) {
     const { data, error } = await query
     if (error) throw error
 
-    return NextResponse.json(data)
+    // Attach category objects for each product
+    const allCatIds = Array.from(new Set((data || []).flatMap((p) => p.category_ids || [])))
+    let cats = []
+    if (allCatIds.length > 0) {
+      const { data: cdata } = await supabase.from('categories').select('id, name, slug').in('id', allCatIds)
+      cats = cdata || []
+    }
+    const mapped = (data || []).map((p) => ({
+      ...p,
+      categories: (p.category_ids || []).map((id) => cats.find((c) => c.id === id)).filter(Boolean),
+    }))
+
+    return NextResponse.json(mapped)
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
@@ -71,12 +86,31 @@ export async function POST(req) {
     }
 
     const body = await req.json()
+    const categoryIds = Array.isArray(body.category_ids) ? Array.from(new Set(body.category_ids)) : []
     const slug = slugify(body.name)
 
     const supabase = createServiceClient()
+    if (categoryIds.length > 0) {
+      const { data: selectedCategories, error: categoryError } = await supabase
+        .from('categories')
+        .select('id, parent_id')
+        .in('id', categoryIds)
+
+      if (categoryError) throw categoryError
+
+      const mainCount = (selectedCategories || []).filter((c) => !c.parent_id).length
+      const subCount = (selectedCategories || []).filter((c) => c.parent_id).length
+      if (mainCount > MAX_MAIN_CATEGORIES || subCount > MAX_SUB_CATEGORIES) {
+        return NextResponse.json(
+          { error: `Choose up to ${MAX_MAIN_CATEGORIES} main categories and ${MAX_SUB_CATEGORIES} subcategories` },
+          { status: 400 }
+        )
+      }
+    }
+
     const { data, error } = await supabase
       .from('products')
-      .insert({ ...body, slug })
+      .insert({ ...body, category_ids: categoryIds, slug })
       .select()
       .single()
 

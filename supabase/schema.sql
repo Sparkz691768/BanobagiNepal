@@ -15,6 +15,7 @@ create table if not exists categories (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   slug text unique not null,
+  parent_id uuid references categories(id) on delete restrict,
   created_at timestamptz default now()
 );
 
@@ -27,7 +28,7 @@ create table if not exists products (
   price numeric not null,
   original_price numeric,
   images text[] default '{}',
-  category_id uuid references categories(id),
+  category_ids uuid[] default '{}',
   stock int default 0,
   is_active boolean default true,
   is_featured boolean default false,

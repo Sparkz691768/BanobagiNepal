@@ -163,7 +163,7 @@ async function seed() {
 
   const productData = products.map(({ category_slug, ...p }) => ({
     ...p,
-    category_id: catMap[category_slug] || null,
+    category_ids: catMap[category_slug] ? [catMap[category_slug]] : [],
   }))
 
   console.log('Seeding products...')
