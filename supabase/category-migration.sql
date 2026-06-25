@@ -28,3 +28,5 @@ where category_ids is null;
 
 alter table public.products
   alter column category_ids set default '{}';
+
+notify pgrst, 'reload schema';
