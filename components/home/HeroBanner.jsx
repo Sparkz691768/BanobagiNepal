@@ -73,14 +73,18 @@ export default function HeroBanner() {
       style={{ minHeight: '100svh' }}
     >
       {slide.image && (
-        <Image
-          src={slide.image}
-          alt={slide.alt}
-          fill
-          priority={current === 0}
-          sizes="100vw"
-          className="object-contain bg-[#e8edf1]"
-        />
+        <>
+          <Image
+            src={slide.image}
+            alt={slide.alt}
+            fill
+            priority={current === 0}
+            sizes="100vw"
+            className="object-cover"
+          />
+          {/* subtle dark overlay at bottom for controls visibility */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30 z-10" />
+        </>
       )}
 
       {/* Subtle grain overlay */}
