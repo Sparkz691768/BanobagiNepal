@@ -17,6 +17,7 @@ const DEFAULTS = {
   store_address: '',
   store_hours: '',
   announcement: 'Free shipping on orders over Rs. 2,000  ·  Authentic Korean Beauty',
+  free_shipping_amount: '2000',
 }
 
 export async function GET() {

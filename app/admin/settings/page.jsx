@@ -64,6 +64,20 @@ export default function AdminSettingsPage() {
     }
   }
 
+  async function saveField(key, value) {
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [key]: value }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      toast.success('Saved!')
+    } catch {
+      toast.error('Failed to save')
+    }
+  }
+
   if (!isAdmin) {
     return (
       <div className="p-8 text-center text-muted text-sm">
@@ -112,14 +126,23 @@ export default function AdminSettingsPage() {
             <p className="text-xs text-muted mb-3">
               The minimum order amount to qualify for free shipping. Shown in the Trust Bar on the homepage.
             </p>
-            <input
-              type="number"
-              value={settings.free_shipping_amount}
-              onChange={(e) => setSettings({ ...settings, free_shipping_amount: e.target.value })}
-              className="input-field w-full max-w-xs"
-              placeholder="2000"
-              min="0"
-            />
+            <div className="flex items-center gap-3 max-w-xs">
+              <input
+                type="number"
+                value={settings.free_shipping_amount}
+                onChange={(e) => setSettings({ ...settings, free_shipping_amount: e.target.value })}
+                className="input-field flex-1"
+                placeholder="2000"
+                min="0"
+              />
+              <button
+                type="button"
+                onClick={() => saveField('free_shipping_amount', settings.free_shipping_amount)}
+                className="btn-primary px-4 py-3 text-xs whitespace-nowrap"
+              >
+                Save
+              </button>
+            </div>
             <div className="mt-3 text-xs text-muted">
               Preview: <span className="text-body font-medium">On orders over Rs. {Number(settings.free_shipping_amount || 2000).toLocaleString()}</span>
             </div>
