@@ -7,6 +7,7 @@ import { FiTrash2 } from 'react-icons/fi'
 
 const EMPTY_SETTINGS = {
   announcement: '',
+  free_shipping_amount: '2000',
   distributor_name: '', distributor_contact_person: '', distributor_phone: '',
   distributor_email: '', distributor_address: '', distributor_hours: '',
   store_name: '', store_contact_person: '', store_phone: '', store_email: '',
@@ -100,6 +101,27 @@ export default function AdminSettingsPage() {
             {/* Live preview */}
             <div className="mt-4 bg-primary text-white text-center text-xs py-2 tracking-widest uppercase font-medium px-4">
               {settings.announcement || 'Preview will appear here'}
+            </div>
+          </div>
+
+          {/* Free shipping threshold */}
+          <div className="bg-white border border-gray-200 p-6">
+            <label className="block text-xs font-semibold tracking-widest uppercase text-muted mb-3">
+              Free Shipping Threshold (Rs.)
+            </label>
+            <p className="text-xs text-muted mb-3">
+              The minimum order amount to qualify for free shipping. Shown in the Trust Bar on the homepage.
+            </p>
+            <input
+              type="number"
+              value={settings.free_shipping_amount}
+              onChange={(e) => setSettings({ ...settings, free_shipping_amount: e.target.value })}
+              className="input-field w-full max-w-xs"
+              placeholder="2000"
+              min="0"
+            />
+            <div className="mt-3 text-xs text-muted">
+              Preview: <span className="text-body font-medium">On orders over Rs. {Number(settings.free_shipping_amount || 2000).toLocaleString()}</span>
             </div>
           </div>
 

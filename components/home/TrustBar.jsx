@@ -1,13 +1,29 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { FiPackage, FiRefreshCw, FiShield, FiAward } from 'react-icons/fi'
 
-const items = [
-  { icon: FiShield, label: '100% Authentic', sub: 'Sourced directly from Korea' },
-  { icon: FiPackage, label: 'Free Shipping', sub: 'On orders over Rs. 2,000' },
-  { icon: FiAward, label: 'Dermatologist Tested', sub: 'Clinically approved formulas' },
-  { icon: FiRefreshCw, label: 'Easy Returns', sub: '3-day hassle-free returns' },
-]
-
 export default function TrustBar() {
+  const [freeShipping, setFreeShipping] = useState('2,000')
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.free_shipping_amount) {
+          setFreeShipping(Number(d.free_shipping_amount).toLocaleString())
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const items = [
+    { icon: FiShield, label: '100% Authentic', sub: 'Sourced directly from Korea' },
+    { icon: FiPackage, label: 'Free Shipping', sub: `On orders over Rs. ${freeShipping}` },
+    { icon: FiAward, label: 'Dermatologist Tested', sub: 'Clinically approved formulas' },
+    { icon: FiRefreshCw, label: 'Easy Returns', sub: '3-day hassle-free returns' },
+  ]
+
   return (
     <section className="border-y border-gray-100 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
