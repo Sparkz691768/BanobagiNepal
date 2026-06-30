@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import toast from 'react-hot-toast'
+import { FiTrash2 } from 'react-icons/fi'
 
 const EMPTY_SETTINGS = {
   announcement: '',
@@ -34,6 +35,15 @@ export default function AdminSettingsPage() {
       .then((d) => { setSettings({ ...EMPTY_SETTINGS, ...d }); setLoading(false) })
       .catch(() => setLoading(false))
   }, [])
+
+  function handleClearSection(prefix) {
+    const cleared = { ...settings }
+    LOCATION_FIELDS.forEach((field) => {
+      cleared[`${prefix}_${field.key}`] = ''
+    })
+    setSettings(cleared)
+    toast.success(`${prefix === 'distributor' ? 'Distributor' : 'Store'} information cleared — click Save to apply`)
+  }
 
   async function handleSave(e) {
     e.preventDefault()
@@ -99,7 +109,18 @@ export default function AdminSettingsPage() {
               { prefix: 'store', title: 'Physical Store Information', description: 'Physical shop details shown on the Contact Us page.' },
             ].map(({ prefix, title, description }) => (
               <section key={prefix} className="bg-white border border-gray-200 p-6">
-                <h2 className="text-sm font-semibold text-dark mb-1">{title}</h2>
+                <div className="flex items-start justify-between mb-1">
+                  <h2 className="text-sm font-semibold text-dark">{title}</h2>
+                  <button
+                    type="button"
+                    onClick={() => handleClearSection(prefix)}
+                    className="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-700 transition-colors"
+                    title={`Clear all ${title} fields`}
+                  >
+                    <FiTrash2 size={13} />
+                    Delete
+                  </button>
+                </div>
                 <p className="text-xs text-muted mb-5">{description}</p>
                 <div className="space-y-4">
                   {LOCATION_FIELDS.map((field) => {
