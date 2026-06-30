@@ -4,9 +4,9 @@ import { FiArrowRight } from 'react-icons/fi'
 export default function PromoBanner() {
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-24">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-1">
         {/* Banner 1 */}
-        <div className="relative bg-dark min-h-[380px] flex flex-col justify-end p-10 overflow-hidden group">
+        <div className="relative bg-dark min-h-[280px] sm:min-h-[380px] flex flex-col justify-end p-7 sm:p-10 overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-dark opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute inset-0 opacity-[0.04] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+PHBhdGggZD0iTTAgMEg2MFY2MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik02MCAwTDAgNjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIuNSIvPjwvc3ZnPg==')]" />
           <div className="relative z-10">
@@ -24,7 +24,7 @@ export default function PromoBanner() {
         </div>
 
         {/* Banner 2 */}
-        <div className="relative bg-dark min-h-[380px] flex flex-col justify-end p-10 overflow-hidden group">
+        <div className="relative bg-dark min-h-[280px] sm:min-h-[380px] flex flex-col justify-end p-7 sm:p-10 overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-dark opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute inset-0 opacity-[0.04] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+PHBhdGggZD0iTTAgMEg2MFY2MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik0wIDYwTDYwIDAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIuNSIvPjwvc3ZnPg==')]" />
           <div className="relative z-10">

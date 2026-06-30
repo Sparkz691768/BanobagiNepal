@@ -23,7 +23,7 @@ export default function CategorySection() {
   if (categories.length === 0) return null
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-24">
+    <section className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-24">
       <div className="flex items-end justify-between mb-12">
         <div>
           <p className="text-[11px] tracking-[0.4em] uppercase text-muted mb-3">Collections</p>
@@ -39,7 +39,7 @@ export default function CategorySection() {
           <Link
             key={cat.id}
             href={`/shop?category=${cat.slug}`}
-            className="group relative bg-white aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden hover:bg-dark transition-colors duration-500"
+            className="group relative bg-white aspect-[4/3] sm:aspect-square flex flex-col items-center justify-center gap-2 overflow-hidden hover:bg-dark transition-colors duration-500"
           >
             <div className="absolute inset-0 bg-dark opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <span className="relative font-display text-xl sm:text-2xl font-light text-dark group-hover:text-white transition-colors duration-500 text-center px-4 leading-tight">
