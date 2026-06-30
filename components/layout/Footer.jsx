@@ -123,6 +123,7 @@ export default function Footer() {
               <li><Link href="/brand#founder" className="text-sm text-gray-300 hover:text-white transition-colors">Founder&apos;s Note</Link></li>
               <li><Link href="/about" className="text-sm text-gray-300 hover:text-white transition-colors">Our Story</Link></li>
               <li><Link href="/contact" className="text-sm text-gray-300 hover:text-white transition-colors">Contact Us</Link></li>
+              <li><Link href="/terms" className="text-sm text-gray-300 hover:text-white transition-colors">Terms &amp; Conditions</Link></li>
             </ul>
           </div>
 

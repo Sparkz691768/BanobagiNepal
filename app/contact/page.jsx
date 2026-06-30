@@ -213,11 +213,21 @@ export default async function ContactPage() {
             <p className="text-sm text-body leading-relaxed mb-3">
               Already placed an order? You can track it and chat directly with our team from your account page.
             </p>
-            <Link
-              href="/account/orders"
-              className="text-sm font-medium text-primary hover:underline"
-            >
+            <Link href="/account/orders" className="text-sm font-medium text-primary hover:underline">
               View My Orders →
+            </Link>
+          </div>
+
+          {/* Terms & Policy */}
+          <div className="bg-white border border-gray-200 p-6">
+            <p className="text-xs font-semibold tracking-widest uppercase text-muted mb-2">
+              Legal &amp; Policies
+            </p>
+            <p className="text-sm text-body leading-relaxed mb-3">
+              Read our terms of service, return policy, and privacy information before placing an order.
+            </p>
+            <Link href="/terms" className="text-sm font-medium text-primary hover:underline">
+              Terms &amp; Conditions →
             </Link>
           </div>
 
