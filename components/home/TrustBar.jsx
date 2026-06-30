@@ -2,7 +2,7 @@ import { FiPackage, FiRefreshCw, FiShield, FiAward } from 'react-icons/fi'
 
 const items = [
   { icon: FiPackage, label: 'Free Shipping', sub: 'Orders over Rs. 2,000' },
-  { icon: FiRefreshCw, label: 'Easy Returns', sub: '7-day return policy' },
+  { icon: FiRefreshCw, label: 'Easy Returns', sub: '3-day return policy' },
   { icon: FiShield, label: '100% Authentic', sub: 'Direct from Korea' },
   { icon: FiAward, label: 'Dermatologist Tested', sub: 'Clinically approved' },
 ]

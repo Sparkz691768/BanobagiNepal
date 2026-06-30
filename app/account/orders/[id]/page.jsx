@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { formatPrice, formatDate, STATUS_COLORS, STATUS_LABELS, PAYMENT_STATUS_COLORS } from '@/lib/utils'
 import ChatWindow from '@/components/chat/ChatWindow'
+import ProductRecommendations from '@/components/product/ProductRecommendations'
 import Image from 'next/image'
 
 export default function CustomerOrderDetailPage({ params }) {
@@ -134,6 +135,8 @@ export default function CustomerOrderDetailPage({ params }) {
           onStatusChange={handleStatusChange}
         />
       </div>
+
+      <ProductRecommendations purchasedItems={items} />
     </div>
   )
 }

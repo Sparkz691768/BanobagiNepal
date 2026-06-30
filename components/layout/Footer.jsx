@@ -140,6 +140,9 @@ export default function Footer() {
             © {new Date().getFullYear()} BanobagiNepal. All rights reserved.
           </p>
           <div className="flex items-center gap-5 order-1 sm:order-2">
+            <Link href="/terms" className="text-xs text-gray-500 hover:text-white transition-colors">
+              Terms &amp; Conditions
+            </Link>
             {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
               <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
                 className="text-gray-500 hover:text-white transition-colors">

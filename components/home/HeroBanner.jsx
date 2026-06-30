@@ -1,10 +1,23 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { FiArrowRight } from 'react-icons/fi'
 
 const slides = [
+  {
+    image: '/images/home/banobagi-in-the-world.jpg',
+    alt: 'BANOBAGI in the world and professional beauty consultant CEO Ban, Jaeyong',
+  },
+  {
+    image: '/images/home/banobagi-products-display.jpg',
+    alt: 'BANOBAGI jelly mask, repair serum, and anti-aging cream product display',
+  },
+  {
+    image: '/images/home/banobagi-pdrn-products.jpg',
+    alt: 'BANOBAGI PDRN lifting ampoule, collagen gel mask, and anti-aging cream',
+  },
   {
     bg: 'from-slate-900 via-slate-800 to-slate-900',
     eyebrow: 'New Arrivals',
@@ -59,10 +72,21 @@ export default function HeroBanner() {
       className={`bg-gradient-to-br ${slide.bg} relative flex items-center justify-center transition-all duration-700`}
       style={{ minHeight: '100svh' }}
     >
-      {/* Subtle grain overlay */}
-      <div className="absolute inset-0 opacity-[0.03] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjY1IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMSIvPjwvc3ZnPg==')]" />
+      {slide.image && (
+        <Image
+          src={slide.image}
+          alt={slide.alt}
+          fill
+          priority={current === 0}
+          sizes="100vw"
+          className="object-contain bg-[#e8edf1]"
+        />
+      )}
 
-      <div
+      {/* Subtle grain overlay */}
+      {!slide.image && <div className="absolute inset-0 opacity-[0.03] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjY1IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMSIvPjwvc3ZnPg==')]" />}
+
+      {!slide.image && <div
         className={`relative z-10 text-center text-white max-w-4xl mx-auto px-6 transition-all duration-300 ${
           animating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
         }`}
@@ -94,7 +118,7 @@ export default function HeroBanner() {
           {slide.cta}
           <FiArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-200" />
         </Link>
-      </div>
+      </div>}
 
       {/* Slide number */}
       <div className="absolute bottom-10 right-10 text-white/30 font-sans text-xs tracking-[0.3em]">

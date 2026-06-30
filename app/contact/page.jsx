@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { FaInstagram, FaFacebook, FaTiktok } from 'react-icons/fa'
-import { FiMail, FiMapPin, FiClock } from 'react-icons/fi'
+import { FiClock, FiMail, FiMapPin, FiPhone, FiShoppingBag, FiTruck, FiUser } from 'react-icons/fi'
+import { createServiceClient } from '@/lib/supabase'
 
 const SOCIAL_LINKS = [
   {
@@ -34,7 +35,72 @@ export const metadata = {
   description: 'Get in touch with BanobagiNepal. Find us on Instagram, Facebook, TikTok, or send us a message.',
 }
 
-export default function ContactPage() {
+export const dynamic = 'force-dynamic'
+
+async function getContactSettings() {
+  const defaults = {
+    distributor_name: '', distributor_contact_person: '', distributor_phone: '',
+    distributor_email: '', distributor_address: '', distributor_hours: '',
+    store_name: '', store_contact_person: '', store_phone: '', store_email: '',
+    store_address: '', store_hours: '',
+  }
+
+  try {
+    const supabase = createServiceClient()
+    const { data, error } = await supabase.from('settings').select('key, value')
+    if (error) throw error
+    return (data || []).reduce((result, row) => ({ ...result, [row.key]: row.value }), defaults)
+  } catch {
+    return defaults
+  }
+}
+
+function LocationCard({ type, settings }) {
+  const isDistributor = type === 'distributor'
+  const title = isDistributor ? 'Authorized Distributor' : 'Physical Store'
+  const Icon = isDistributor ? FiTruck : FiShoppingBag
+  const name = settings[`${type}_name`]
+  const phone = settings[`${type}_phone`]
+  const email = settings[`${type}_email`]
+  const details = [
+    { key: 'contact', icon: FiUser, value: settings[`${type}_contact_person`] },
+    { key: 'address', icon: FiMapPin, value: settings[`${type}_address`] },
+    { key: 'phone', icon: FiPhone, value: phone, href: phone ? `tel:${phone.replace(/\s/g, '')}` : '' },
+    { key: 'email', icon: FiMail, value: email, href: email ? `mailto:${email}` : '' },
+    { key: 'hours', icon: FiClock, value: settings[`${type}_hours`] },
+  ].filter((detail) => detail.value)
+
+  return (
+    <article className="bg-white border border-gray-200 p-6 sm:p-8 shadow-sm">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-11 h-11 rounded-full bg-light-fill text-primary flex items-center justify-center">
+          <Icon size={21} />
+        </div>
+        <div>
+          <p className="text-[10px] tracking-[0.25em] uppercase text-muted">{title}</p>
+          <h3 className="font-display text-2xl text-dark">{name || title}</h3>
+        </div>
+      </div>
+
+      {details.length ? (
+        <div className="space-y-3">
+          {details.map(({ key, icon: DetailIcon, value, href }) => (
+            <div key={key} className="flex items-start gap-3 text-sm text-muted">
+              <DetailIcon className="mt-0.5 text-primary shrink-0" size={17} />
+              {href ? <a href={href} className="hover:text-primary transition-colors">{value}</a> : <span>{value}</span>}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted">Details will be updated soon.</p>
+      )}
+    </article>
+  )
+}
+
+export default async function ContactPage() {
+  const settings = await getContactSettings()
+
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
       {/* Header */}
@@ -45,6 +111,17 @@ export default function ContactPage() {
           Have a question about a product, an order, or just want to say hello? Reach us through any of the channels below — we&apos;d love to hear from you.
         </p>
       </div>
+
+      <section className="mb-16">
+        <div className="mb-6">
+          <p className="text-xs tracking-[0.3em] uppercase text-muted mb-2">Visit or Connect</p>
+          <h2 className="font-display text-3xl sm:text-4xl font-light text-dark">Where to Find Us</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <LocationCard type="distributor" settings={settings} />
+          <LocationCard type="store" settings={settings} />
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Social Media */}

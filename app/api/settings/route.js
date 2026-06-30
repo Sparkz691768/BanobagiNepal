@@ -4,6 +4,18 @@ import { authOptions } from '@/lib/auth'
 import { createServiceClient } from '@/lib/supabase'
 
 const DEFAULTS = {
+  distributor_name: '',
+  distributor_contact_person: '',
+  distributor_phone: '',
+  distributor_email: '',
+  distributor_address: '',
+  distributor_hours: '',
+  store_name: '',
+  store_contact_person: '',
+  store_phone: '',
+  store_email: '',
+  store_address: '',
+  store_hours: '',
   announcement: 'Free shipping on orders over Rs. 2,000  ·  Authentic Korean Beauty',
 }
 
@@ -34,9 +46,13 @@ export async function PATCH(req) {
     const supabase = createServiceClient()
 
     for (const [key, value] of Object.entries(updates)) {
-      await supabase
+      if (!(key in DEFAULTS)) continue
+
+      const { error } = await supabase
         .from('settings')
-        .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+        .upsert({ key, value: String(value || ''), updated_at: new Date().toISOString() }, { onConflict: 'key' })
+
+      if (error) throw error
     }
 
     return NextResponse.json({ success: true })

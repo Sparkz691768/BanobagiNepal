@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi'
+import { FiChevronLeft, FiChevronRight, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi'
 import { formatPrice, formatDate } from '@/lib/utils'
 import StarRating from '@/components/product/StarRating'
 import ReviewForm from '@/components/product/ReviewForm'
@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 
 export default function ProductDetailClient({ product, initialReviews }) {
   const [selectedImage, setSelectedImage] = useState(0)
+  const [isGalleryPaused, setIsGalleryPaused] = useState(false)
   const [quantity, setQuantity] = useState(1)
   const [reviews, setReviews] = useState(initialReviews)
   const addItem = useCart((s) => s.addItem)
@@ -21,6 +22,24 @@ export default function ProductDetailClient({ product, initialReviews }) {
       ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
       : null
   const maxQty = product.stock
+
+  useEffect(() => {
+    if (images.length < 2 || isGalleryPaused) return
+
+    const timer = setTimeout(() => {
+      setSelectedImage((current) => (current + 1) % images.length)
+    }, 4000)
+
+    return () => clearTimeout(timer)
+  }, [selectedImage, images.length, isGalleryPaused])
+
+  function showPreviousImage() {
+    setSelectedImage((current) => (current - 1 + images.length) % images.length)
+  }
+
+  function showNextImage() {
+    setSelectedImage((current) => (current + 1) % images.length)
+  }
 
   function handleAddToCart() {
     if (product.stock < 1) return
@@ -38,7 +57,11 @@ export default function ProductDetailClient({ product, initialReviews }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
         {/* Images */}
         <div>
-          <div className="relative aspect-square bg-gray-50 mb-4 overflow-hidden">
+          <div
+            className="relative aspect-square bg-gray-50 mb-4 overflow-hidden group/gallery"
+            onMouseEnter={() => setIsGalleryPaused(true)}
+            onMouseLeave={() => setIsGalleryPaused(false)}
+          >
             {images[selectedImage] ? (
               <Image
                 src={images[selectedImage]}
@@ -56,6 +79,30 @@ export default function ProductDetailClient({ product, initialReviews }) {
                 -{discount}%
               </span>
             )}
+
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={showPreviousImage}
+                  aria-label="Show previous product image"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 text-dark shadow-md flex items-center justify-center hover:bg-white hover:text-primary transition-all sm:opacity-0 sm:group-hover/gallery:opacity-100 focus:opacity-100"
+                >
+                  <FiChevronLeft size={23} />
+                </button>
+                <button
+                  type="button"
+                  onClick={showNextImage}
+                  aria-label="Show next product image"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 text-dark shadow-md flex items-center justify-center hover:bg-white hover:text-primary transition-all sm:opacity-0 sm:group-hover/gallery:opacity-100 focus:opacity-100"
+                >
+                  <FiChevronRight size={23} />
+                </button>
+                <span className="absolute right-4 bottom-4 rounded-full bg-dark/70 px-3 py-1 text-[11px] text-white tracking-wider">
+                  {selectedImage + 1} / {images.length}
+                </span>
+              </>
+            )}
           </div>
           {images.length > 1 && (
             <div className="flex gap-2">
@@ -64,6 +111,8 @@ export default function ProductDetailClient({ product, initialReviews }) {
                   key={i}
                   type="button"
                   onClick={() => setSelectedImage(i)}
+                  aria-label={`Show product image ${i + 1}`}
+                  aria-current={i === selectedImage ? 'true' : undefined}
                   className={`relative w-20 h-20 bg-gray-50 overflow-hidden border-2 transition-colors ${
                     i === selectedImage ? 'border-primary' : 'border-transparent'
                   }`}
