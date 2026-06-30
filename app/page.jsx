@@ -1,5 +1,6 @@
 ﻿import HeroBanner from '@/components/home/HeroBanner'
 import TrustBar from '@/components/home/TrustBar'
+import EditorialStrip from '@/components/home/EditorialStrip'
 import CategorySection from '@/components/home/CategorySection'
 import FeaturedProducts from '@/components/home/FeaturedProducts'
 import PromoBanner from '@/components/home/PromoBanner'
@@ -11,6 +12,7 @@ export default function HomePage() {
         <HeroBanner />
       </div>
       <TrustBar />
+      <EditorialStrip />
       <CategorySection />
       <FeaturedProducts />
       <PromoBanner />
