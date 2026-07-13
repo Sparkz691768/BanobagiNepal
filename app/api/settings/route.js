@@ -4,6 +4,10 @@ import { authOptions } from '@/lib/auth'
 import { createServiceClient } from '@/lib/supabase'
 
 const DEFAULTS = {
+  distributors: '[]',
+  stores: '[]',
+  announcement: 'Free shipping on orders over Rs. 2,000  ·  Authentic Korean Beauty',
+  free_shipping_amount: '2000',
   distributor_name: '',
   distributor_contact_person: '',
   distributor_phone: '',
@@ -16,8 +20,6 @@ const DEFAULTS = {
   store_email: '',
   store_address: '',
   store_hours: '',
-  announcement: 'Free shipping on orders over Rs. 2,000  ·  Authentic Korean Beauty',
-  free_shipping_amount: '2000',
 }
 
 export async function GET() {

@@ -38,37 +38,41 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 async function getContactSettings() {
-  const defaults = {
-    distributor_name: '', distributor_contact_person: '', distributor_phone: '',
-    distributor_email: '', distributor_address: '', distributor_hours: '',
-    store_name: '', store_contact_person: '', store_phone: '', store_email: '',
-    store_address: '', store_hours: '',
-  }
-
   try {
     const supabase = createServiceClient()
     const { data, error } = await supabase.from('settings').select('key, value')
     if (error) throw error
-    return (data || []).reduce((result, row) => ({ ...result, [row.key]: row.value }), defaults)
+    const map = (data || []).reduce((r, row) => ({ ...r, [row.key]: row.value }), {})
+
+    let distributors = []
+    let stores = []
+
+    try { distributors = JSON.parse(map.distributors || '[]') } catch {}
+    try { stores = JSON.parse(map.stores || '[]') } catch {}
+
+    // Migrate legacy single-entry
+    if (distributors.length === 0 && map.distributor_name) {
+      distributors = [{ name: map.distributor_name, contact_person: map.distributor_contact_person, phone: map.distributor_phone, email: map.distributor_email, address: map.distributor_address, hours: map.distributor_hours }]
+    }
+    if (stores.length === 0 && map.store_name) {
+      stores = [{ name: map.store_name, contact_person: map.store_contact_person, phone: map.store_phone, email: map.store_email, address: map.store_address, hours: map.store_hours }]
+    }
+
+    return { distributors, stores }
   } catch {
-    return defaults
+    return { distributors: [], stores: [] }
   }
 }
 
-function LocationCard({ type, settings }) {
-  const isDistributor = type === 'distributor'
-  const title = isDistributor ? 'Authorized Distributor' : 'Physical Store'
-  const Icon = isDistributor ? FiTruck : FiShoppingBag
-  const name = settings[`${type}_name`]
-  const phone = settings[`${type}_phone`]
-  const email = settings[`${type}_email`]
+function LocationCard({ entry, label, Icon }) {
+  const { name, contact_person, phone, email, address, hours } = entry
   const details = [
-    { key: 'contact', icon: FiUser, value: settings[`${type}_contact_person`] },
-    { key: 'address', icon: FiMapPin, value: settings[`${type}_address`] },
+    { key: 'contact', icon: FiUser, value: contact_person },
+    { key: 'address', icon: FiMapPin, value: address },
     { key: 'phone', icon: FiPhone, value: phone, href: phone ? `tel:${phone.replace(/\s/g, '')}` : '' },
     { key: 'email', icon: FiMail, value: email, href: email ? `mailto:${email}` : '' },
-    { key: 'hours', icon: FiClock, value: settings[`${type}_hours`] },
-  ].filter((detail) => detail.value)
+    { key: 'hours', icon: FiClock, value: hours },
+  ].filter((d) => d.value)
 
   return (
     <article className="bg-white border border-gray-200 p-6 sm:p-8 shadow-sm">
@@ -77,11 +81,10 @@ function LocationCard({ type, settings }) {
           <Icon size={21} />
         </div>
         <div>
-          <p className="text-[10px] tracking-[0.25em] uppercase text-muted">{title}</p>
-          <h3 className="font-display text-2xl text-dark">{name || title}</h3>
+          <p className="text-[10px] tracking-[0.25em] uppercase text-muted">{label}</p>
+          <h3 className="font-display text-2xl text-dark">{name || label}</h3>
         </div>
       </div>
-
       {details.length ? (
         <div className="space-y-3">
           {details.map(({ key, icon: DetailIcon, value, href }) => (
@@ -99,7 +102,7 @@ function LocationCard({ type, settings }) {
 }
 
 export default async function ContactPage() {
-  const settings = await getContactSettings()
+  const { distributors, stores } = await getContactSettings()
 
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
@@ -117,10 +120,30 @@ export default async function ContactPage() {
           <p className="text-xs tracking-[0.3em] uppercase text-muted mb-2">Visit or Connect</p>
           <h2 className="font-display text-3xl sm:text-4xl font-light text-dark">Where to Find Us</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <LocationCard type="distributor" settings={settings} />
-          <LocationCard type="store" settings={settings} />
-        </div>
+        {(distributors.length > 0 || stores.length > 0) && (
+          <div className="space-y-8">
+            {distributors.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold tracking-widest uppercase text-muted mb-4">Authorized Distributors</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {distributors.map((entry, i) => (
+                    <LocationCard key={i} entry={entry} label="Authorized Distributor" Icon={FiTruck} />
+                  ))}
+                </div>
+              </div>
+            )}
+            {stores.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold tracking-widest uppercase text-muted mb-4">Physical Stores</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {stores.map((entry, i) => (
+                    <LocationCard key={i} entry={entry} label="Physical Store" Icon={FiShoppingBag} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">

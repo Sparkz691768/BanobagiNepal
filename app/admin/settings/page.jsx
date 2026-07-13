@@ -3,16 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import toast from 'react-hot-toast'
-import { FiTrash2 } from 'react-icons/fi'
+import { FiTrash2, FiPlus } from 'react-icons/fi'
 
-const EMPTY_SETTINGS = {
-  announcement: '',
-  free_shipping_amount: '2000',
-  distributor_name: '', distributor_contact_person: '', distributor_phone: '',
-  distributor_email: '', distributor_address: '', distributor_hours: '',
-  store_name: '', store_contact_person: '', store_phone: '', store_email: '',
-  store_address: '', store_hours: '',
-}
+const EMPTY_ENTRY = { name: '', contact_person: '', phone: '', email: '', address: '', hours: '' }
 
 const LOCATION_FIELDS = [
   { key: 'name', label: 'Business / Location Name', placeholder: 'Enter name' },
@@ -23,45 +16,93 @@ const LOCATION_FIELDS = [
   { key: 'hours', label: 'Opening / Contact Hours', placeholder: 'Sun–Fri, 10:00 AM–6:00 PM' },
 ]
 
+function LocationCard({ entry, index, onChange, onDelete }) {
+  return (
+    <div className="border border-gray-200 p-4 mb-4 relative">
+      <button
+        type="button"
+        onClick={() => onDelete(index)}
+        className="absolute top-3 right-3 text-red-400 hover:text-red-600 transition-colors"
+        title="Remove"
+      >
+        <FiTrash2 size={14} />
+      </button>
+      <div className="space-y-3">
+        {LOCATION_FIELDS.map((field) => (
+          <label key={field.key} className="block">
+            <span className="block text-xs font-medium text-body mb-1">{field.label}</span>
+            {field.multiline ? (
+              <textarea
+                value={entry[field.key] || ''}
+                onChange={(e) => onChange(index, field.key, e.target.value)}
+                className="input-field w-full"
+                placeholder={field.placeholder}
+                rows={2}
+              />
+            ) : (
+              <input
+                type={field.type || 'text'}
+                value={entry[field.key] || ''}
+                onChange={(e) => onChange(index, field.key, e.target.value)}
+                className="input-field w-full"
+                placeholder={field.placeholder}
+              />
+            )}
+          </label>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function AdminSettingsPage() {
   const { data: session } = useSession()
   const isAdmin = session?.user?.role === 'admin'
-  const [settings, setSettings] = useState(EMPTY_SETTINGS)
+  const [announcement, setAnnouncement] = useState('')
+  const [freeShipping, setFreeShipping] = useState('2000')
+  const [distributors, setDistributors] = useState([{ ...EMPTY_ENTRY }])
+  const [stores, setStores] = useState([{ ...EMPTY_ENTRY }])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     fetch('/api/settings')
       .then((r) => r.json())
-      .then((d) => { setSettings({ ...EMPTY_SETTINGS, ...d }); setLoading(false) })
+      .then((d) => {
+        setAnnouncement(d.announcement || '')
+        setFreeShipping(d.free_shipping_amount || '2000')
+
+        // Load multi-entry arrays
+        try {
+          const dist = JSON.parse(d.distributors || '[]')
+          setDistributors(dist.length > 0 ? dist : [{ ...EMPTY_ENTRY }])
+        } catch {
+          // Migrate legacy single entry
+          const legacy = { name: d.distributor_name, contact_person: d.distributor_contact_person, phone: d.distributor_phone, email: d.distributor_email, address: d.distributor_address, hours: d.distributor_hours }
+          setDistributors(legacy.name ? [legacy] : [{ ...EMPTY_ENTRY }])
+        }
+
+        try {
+          const st = JSON.parse(d.stores || '[]')
+          setStores(st.length > 0 ? st : [{ ...EMPTY_ENTRY }])
+        } catch {
+          const legacy = { name: d.store_name, contact_person: d.store_contact_person, phone: d.store_phone, email: d.store_email, address: d.store_address, hours: d.store_hours }
+          setStores(legacy.name ? [legacy] : [{ ...EMPTY_ENTRY }])
+        }
+
+        setLoading(false)
+      })
       .catch(() => setLoading(false))
   }, [])
 
-  function handleClearSection(prefix) {
-    const cleared = { ...settings }
-    LOCATION_FIELDS.forEach((field) => {
-      cleared[`${prefix}_${field.key}`] = ''
-    })
-    setSettings(cleared)
-    toast.success(`${prefix === 'distributor' ? 'Distributor' : 'Store'} information cleared — click Save to apply`)
+  function updateEntry(list, setList, index, key, value) {
+    const updated = list.map((e, i) => i === index ? { ...e, [key]: value } : e)
+    setList(updated)
   }
 
-  async function handleSave(e) {
-    e.preventDefault()
-    setSaving(true)
-    try {
-      const res = await fetch('/api/settings', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings),
-      })
-      if (!res.ok) throw new Error('Failed')
-      toast.success('Settings saved!')
-    } catch {
-      toast.error('Failed to save')
-    } finally {
-      setSaving(false)
-    }
+  function deleteEntry(list, setList, index) {
+    if (list.length === 1) { setList([{ ...EMPTY_ENTRY }]); return }
+    setList(list.filter((_, i) => i !== index))
   }
 
   async function saveField(key, value) {
@@ -78,12 +119,31 @@ export default function AdminSettingsPage() {
     }
   }
 
+  async function handleSave(e) {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          announcement,
+          free_shipping_amount: freeShipping,
+          distributors: JSON.stringify(distributors),
+          stores: JSON.stringify(stores),
+        }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      toast.success('Settings saved!')
+    } catch {
+      toast.error('Failed to save')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   if (!isAdmin) {
-    return (
-      <div className="p-8 text-center text-muted text-sm">
-        Admin access required.
-      </div>
-    )
+    return <div className="p-8 text-center text-muted text-sm">Admin access required.</div>
   }
 
   return (
@@ -107,14 +167,13 @@ export default function AdminSettingsPage() {
             </p>
             <input
               type="text"
-              value={settings.announcement}
-              onChange={(e) => setSettings({ ...settings, announcement: e.target.value })}
+              value={announcement}
+              onChange={(e) => setAnnouncement(e.target.value)}
               className="input-field w-full"
               placeholder="Free shipping on orders over Rs. 2,000 · Authentic Korean Beauty"
             />
-            {/* Live preview */}
             <div className="mt-4 bg-primary text-white text-center text-xs py-2 tracking-widest uppercase font-medium px-4">
-              {settings.announcement || 'Preview will appear here'}
+              {announcement || 'Preview will appear here'}
             </div>
           </div>
 
@@ -129,67 +188,70 @@ export default function AdminSettingsPage() {
             <div className="flex items-center gap-3 max-w-xs">
               <input
                 type="number"
-                value={settings.free_shipping_amount}
-                onChange={(e) => setSettings({ ...settings, free_shipping_amount: e.target.value })}
+                value={freeShipping}
+                onChange={(e) => setFreeShipping(e.target.value)}
                 className="input-field flex-1"
                 placeholder="2000"
                 min="0"
               />
               <button
                 type="button"
-                onClick={() => saveField('free_shipping_amount', settings.free_shipping_amount)}
+                onClick={() => saveField('free_shipping_amount', freeShipping)}
                 className="btn-primary px-4 py-3 text-xs whitespace-nowrap"
               >
                 Save
               </button>
             </div>
             <div className="mt-3 text-xs text-muted">
-              Preview: <span className="text-body font-medium">On orders over Rs. {Number(settings.free_shipping_amount || 2000).toLocaleString()}</span>
+              Preview: <span className="text-body font-medium">On orders over Rs. {Number(freeShipping || 2000).toLocaleString()}</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {[
-              { prefix: 'distributor', title: 'Distributor Information', description: 'Official distributor details shown on the Contact Us page.' },
-              { prefix: 'store', title: 'Physical Store Information', description: 'Physical shop details shown on the Contact Us page.' },
-            ].map(({ prefix, title, description }) => (
-              <section key={prefix} className="bg-white border border-gray-200 p-6">
-                <div className="flex items-start justify-between mb-1">
-                  <h2 className="text-sm font-semibold text-dark">{title}</h2>
-                  <button
-                    type="button"
-                    onClick={() => handleClearSection(prefix)}
-                    className="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-700 transition-colors"
-                    title={`Clear all ${title} fields`}
-                  >
-                    <FiTrash2 size={13} />
-                    Delete
-                  </button>
-                </div>
-                <p className="text-xs text-muted mb-5">{description}</p>
-                <div className="space-y-4">
-                  {LOCATION_FIELDS.map((field) => {
-                    const settingKey = `${prefix}_${field.key}`
-                    const sharedProps = {
-                      value: settings[settingKey],
-                      onChange: (e) => setSettings({ ...settings, [settingKey]: e.target.value }),
-                      className: 'input-field w-full',
-                      placeholder: field.placeholder,
-                    }
+          {/* Distributors */}
+          <div className="bg-white border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-sm font-semibold text-dark">Distributor Information</h2>
+              <button
+                type="button"
+                onClick={() => setDistributors([...distributors, { ...EMPTY_ENTRY }])}
+                className="flex items-center gap-1.5 text-xs text-primary hover:text-accent transition-colors font-medium"
+              >
+                <FiPlus size={13} /> Add Distributor
+              </button>
+            </div>
+            <p className="text-xs text-muted mb-4">Official distributor details shown on the Contact Us page.</p>
+            {distributors.map((entry, i) => (
+              <LocationCard
+                key={i}
+                entry={entry}
+                index={i}
+                onChange={(idx, key, val) => updateEntry(distributors, setDistributors, idx, key, val)}
+                onDelete={(idx) => deleteEntry(distributors, setDistributors, idx)}
+              />
+            ))}
+          </div>
 
-                    return (
-                      <label key={settingKey} className="block">
-                        <span className="block text-xs font-medium text-body mb-1.5">{field.label}</span>
-                        {field.multiline ? (
-                          <textarea {...sharedProps} rows={3} />
-                        ) : (
-                          <input {...sharedProps} type={field.type || 'text'} />
-                        )}
-                      </label>
-                    )
-                  })}
-                </div>
-              </section>
+          {/* Stores */}
+          <div className="bg-white border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-sm font-semibold text-dark">Physical Store Information</h2>
+              <button
+                type="button"
+                onClick={() => setStores([...stores, { ...EMPTY_ENTRY }])}
+                className="flex items-center gap-1.5 text-xs text-primary hover:text-accent transition-colors font-medium"
+              >
+                <FiPlus size={13} /> Add Store
+              </button>
+            </div>
+            <p className="text-xs text-muted mb-4">Physical shop details shown on the Contact Us page.</p>
+            {stores.map((entry, i) => (
+              <LocationCard
+                key={i}
+                entry={entry}
+                index={i}
+                onChange={(idx, key, val) => updateEntry(stores, setStores, idx, key, val)}
+                onDelete={(idx) => deleteEntry(stores, setStores, idx)}
+              />
             ))}
           </div>
 
