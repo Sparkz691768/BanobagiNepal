@@ -63,12 +63,12 @@ export default function ProductDetailClient({ product, initialReviews }) {
             onMouseLeave={() => setIsGalleryPaused(false)}
           >
             {images[selectedImage] ? (
-              <div className="absolute inset-3">
+              <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center" style={{ padding: '12px' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={images[selectedImage]}
                   alt={product.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', display: 'block' }}
+                  style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }}
                 />
               </div>
             ) : (
@@ -119,9 +119,9 @@ export default function ProductDetailClient({ product, initialReviews }) {
                     i === selectedImage ? 'border-primary' : 'border-gray-200'
                   }`}
                 >
-                  <div className="absolute inset-1">
+                  <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center" style={{ padding: '4px' }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
+                    <img src={img} alt="" style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }} />
                   </div>
                 </button>
               ))}

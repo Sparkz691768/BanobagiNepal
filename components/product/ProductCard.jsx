@@ -29,12 +29,12 @@ export default function ProductCard({ product }) {
       {/* Image frame — guaranteed fixed frame, image always contained inside */}
       <div className="relative w-full overflow-hidden mb-3 bg-gray-50 border border-gray-100" style={{ height: 'clamp(160px, 45vw, 280px)' }}>
         {image ? (
-          <div className="absolute inset-[6px] group-hover:scale-105 transition-transform duration-700 ease-out">
+          <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-700 ease-out" style={{ padding: '6px' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={image}
               alt={product.name}
-              style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', display: 'block' }}
+              style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }}
             />
           </div>
         ) : (
