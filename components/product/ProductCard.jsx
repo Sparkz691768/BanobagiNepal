@@ -27,15 +27,16 @@ export default function ProductCard({ product }) {
 
   return (
     <Link href={`/shop/${product.slug}`} className="group block">
-      {/* Image — fixed square ratio on mobile, 3/4 on desktop */}
-      <div className="relative aspect-square sm:aspect-[3/4] bg-gray-50 overflow-hidden mb-3">
+      {/* Image frame — strict square on mobile, 3/4 on desktop. overflow-hidden clips everything. */}
+      <div className="relative w-full aspect-square sm:aspect-[3/4] bg-gray-50 border border-gray-100 overflow-hidden mb-3 shrink-0">
         {image ? (
           <Image
             src={image}
             alt={product.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-contain object-center group-hover:scale-105 transition-transform duration-700 ease-out p-1"
+            className="object-contain object-center p-2 group-hover:scale-105 transition-transform duration-700 ease-out"
+            style={{ maxWidth: '100%', maxHeight: '100%' }}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">

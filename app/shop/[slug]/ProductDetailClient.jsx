@@ -58,7 +58,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
         {/* Images */}
         <div>
           <div
-            className="relative aspect-square bg-gray-50 mb-4 overflow-hidden group/gallery"
+            className="relative w-full aspect-square bg-gray-50 border border-gray-100 mb-4 overflow-hidden group/gallery"
             onMouseEnter={() => setIsGalleryPaused(true)}
             onMouseLeave={() => setIsGalleryPaused(false)}
           >
@@ -67,7 +67,8 @@ export default function ProductDetailClient({ product, initialReviews }) {
                 src={images[selectedImage]}
                 alt={product.name}
                 fill
-                className="object-contain p-1"
+                className="object-contain p-3"
+                style={{ maxWidth: '100%', maxHeight: '100%' }}
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-muted text-sm">
