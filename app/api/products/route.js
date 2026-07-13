@@ -87,9 +87,18 @@ export async function POST(req) {
 
     const body = await req.json()
     const categoryIds = Array.isArray(body.category_ids) ? Array.from(new Set(body.category_ids)) : []
-    const slug = slugify(body.name)
+    const baseSlug = slugify(body.name)
 
     const supabase = createServiceClient()
+
+    // Ensure slug is unique
+    let slug = baseSlug
+    let suffix = 2
+    while (true) {
+      const { data: existing } = await supabase.from('products').select('id').eq('slug', slug).maybeSingle()
+      if (!existing) break
+      slug = `${baseSlug}-${suffix++}`
+    }
     if (categoryIds.length > 0) {
       const { data: selectedCategories, error: categoryError } = await supabase
         .from('categories')

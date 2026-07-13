@@ -20,6 +20,10 @@ export async function POST(req) {
     if (!name || !email || !password) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
+    }
     if (password.length < 6) {
       return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 })
     }
@@ -64,6 +68,6 @@ export async function POST(req) {
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error('send-otp error:', err)
-    return NextResponse.json({ error: `Failed to send verification code. SMTP error: ${err.message}` }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to send verification code. Please try again.' }, { status: 500 })
   }
 }

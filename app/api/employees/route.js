@@ -37,15 +37,16 @@ export async function POST(req) {
       return NextResponse.json({ error: 'All fields required' }, { status: 400 })
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
+    }
+
     const supabase = createServiceClient()
-
-    const { count } = await supabase
-      .from('users')
-      .select('id', { count: 'exact', head: true })
-      .eq('role', 'employee')
-
-    const employeeId = 'BNB-EMP-' + String((count || 0) + 1).padStart(4, '0')
     const hashed = await bcrypt.hash(password, 12)
+
+    // Generate unique employee ID using timestamp to avoid race conditions
+    const employeeId = 'BNB-EMP-' + Date.now().toString(36).toUpperCase()
 
     const { data, error } = await supabase
       .from('users')

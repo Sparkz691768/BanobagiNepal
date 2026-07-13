@@ -23,7 +23,9 @@ const useCart = create(
             ),
           })
         } else {
-          set({ items: [...items, { ...product, quantity }] })
+          // Only store fields needed for cart display and checkout
+          const { id, name, price, images, slug, stock } = product
+          set({ items: [...items, { id, name, price, images, slug, stock, quantity }] })
         }
       },
 

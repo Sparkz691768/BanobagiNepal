@@ -16,6 +16,10 @@ export async function POST(req) {
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
+    }
 
     const supabase = createServiceClient()
     const { data: user } = await supabase
@@ -35,6 +39,6 @@ export async function POST(req) {
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error('forgot-password error:', err)
-    return NextResponse.json({ error: `Failed to send reset email. SMTP error: ${err.message}` }, { status: 500 })
+    return NextResponse.json({ error: 'Unable to send reset email. Please try again.' }, { status: 500 })
   }
 }

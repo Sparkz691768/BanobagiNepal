@@ -16,12 +16,29 @@ const toTitleCase = (str) => str.toLowerCase().replace(/\b\w/g, (c) => c.toUpper
 
 function NewsletterForm() {
   const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     if (!email) return
-    toast.success('Thank you for subscribing!')
-    setEmail('')
+    setLoading(true)
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to subscribe')
+      }
+      toast.success('Thank you for subscribing!')
+      setEmail('')
+    } catch (err) {
+      toast.error(err.message || 'Failed to subscribe')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -37,10 +54,11 @@ function NewsletterForm() {
         />
         <button
           type="submit"
-          className="bg-primary text-white text-xs font-semibold tracking-widest uppercase px-5 py-3 hover:bg-accent transition-colors whitespace-nowrap flex-shrink-0"
+          disabled={loading}
+          className="bg-primary text-white text-xs font-semibold tracking-widest uppercase px-5 py-3 hover:bg-accent transition-colors whitespace-nowrap flex-shrink-0 disabled:opacity-60"
           style={{ minHeight: '44px' }}
         >
-          Subscribe
+          {loading ? '...' : 'Subscribe'}
         </button>
       </div>
     </form>

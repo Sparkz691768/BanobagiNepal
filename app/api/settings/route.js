@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createServiceClient } from '@/lib/supabase'
 
+// Keys readable by anyone (used in Navbar, TrustBar, etc.)
+const PUBLIC_KEYS = new Set(['announcement', 'free_shipping_amount'])
+
 const DEFAULTS = {
   distributors: '[]',
   stores: '[]',
@@ -22,8 +25,11 @@ const DEFAULTS = {
   store_hours: '',
 }
 
-export async function GET() {
+export async function GET(req) {
   try {
+    const session = await getServerSession(authOptions)
+    const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'employee'
+
     const supabase = createServiceClient()
     const { data, error } = await supabase.from('settings').select('key, value')
     if (error) throw error
@@ -32,9 +38,21 @@ export async function GET() {
     for (const row of data || []) {
       result[row.key] = row.value
     }
+
+    // Non-admin callers only get public keys
+    if (!isAdmin) {
+      return NextResponse.json({
+        announcement: result.announcement,
+        free_shipping_amount: result.free_shipping_amount,
+      })
+    }
+
     return NextResponse.json(result)
   } catch {
-    return NextResponse.json(DEFAULTS)
+    return NextResponse.json({
+      announcement: DEFAULTS.announcement,
+      free_shipping_amount: DEFAULTS.free_shipping_amount,
+    })
   }
 }
 
@@ -48,15 +66,22 @@ export async function PATCH(req) {
     const updates = await req.json()
     const supabase = createServiceClient()
 
-    for (const [key, value] of Object.entries(updates)) {
-      if (!(key in DEFAULTS)) continue
+    // Batch all upserts in a single call
+    const rows = Object.entries(updates)
+      .filter(([key]) => key in DEFAULTS)
+      .map(([key, value]) => ({
+        key,
+        value: String(value || ''),
+        updated_at: new Date().toISOString(),
+      }))
 
-      const { error } = await supabase
-        .from('settings')
-        .upsert({ key, value: String(value || ''), updated_at: new Date().toISOString() }, { onConflict: 'key' })
+    if (rows.length === 0) return NextResponse.json({ success: true })
 
-      if (error) throw error
-    }
+    const { error } = await supabase
+      .from('settings')
+      .upsert(rows, { onConflict: 'key' })
+
+    if (error) throw error
 
     return NextResponse.json({ success: true })
   } catch (err) {

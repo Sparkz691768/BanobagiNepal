@@ -33,7 +33,6 @@ export async function POST(req) {
     const body = await req.json()
     const {
       items,
-      total_amount,
       shipping_name,
       shipping_email,
       shipping_phone,
@@ -42,16 +41,50 @@ export async function POST(req) {
       shipping_notes,
     } = body
 
-    if (!items?.length || !total_amount) {
+    if (!items?.length) {
       return NextResponse.json({ error: 'Invalid order data' }, { status: 400 })
     }
 
     const supabase = createServiceClient()
+
+    // Validate prices server-side — never trust client-supplied prices
+    const productIds = items.map((i) => i.id)
+    const { data: products, error: productError } = await supabase
+      .from('products')
+      .select('id, price, stock, is_active')
+      .in('id', productIds)
+
+    if (productError) throw productError
+
+    const productMap = Object.fromEntries((products || []).map((p) => [p.id, p]))
+
+    for (const item of items) {
+      const product = productMap[item.id]
+      if (!product || !product.is_active) {
+        return NextResponse.json({ error: `Product not available` }, { status: 400 })
+      }
+      if (product.stock < item.quantity) {
+        return NextResponse.json({ error: `Insufficient stock for one or more items` }, { status: 400 })
+      }
+    }
+
+    // Compute total server-side
+    const total_amount = items.reduce((sum, item) => {
+      const product = productMap[item.id]
+      return sum + product.price * item.quantity
+    }, 0)
+
+    // Build validated items with server-side prices
+    const validatedItems = items.map((item) => ({
+      ...item,
+      price: productMap[item.id].price,
+    }))
+
     const { data: order, error } = await supabase
       .from('orders')
       .insert({
         user_id: session.user.id,
-        items,
+        items: validatedItems,
         total_amount,
         status: 'pending',
         payment_status: 'unpaid',
@@ -67,15 +100,19 @@ export async function POST(req) {
 
     if (error) throw error
 
-    // Insert order items
-    if (items?.length) {
-      const orderItems = items.map((item) => ({
-        order_id: order.id,
-        product_id: item.id,
-        quantity: item.quantity,
-        price: item.price,
-      }))
-      await supabase.from('order_items').insert(orderItems)
+    // Insert order items with validated prices
+    const orderItems = validatedItems.map((item) => ({
+      order_id: order.id,
+      product_id: item.id,
+      quantity: item.quantity,
+      price: productMap[item.id].price,
+    }))
+
+    const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
+    if (itemsError) {
+      // Rollback the order if items failed
+      await supabase.from('orders').delete().eq('id', order.id)
+      throw itemsError
     }
 
     // Auto welcome message from staff

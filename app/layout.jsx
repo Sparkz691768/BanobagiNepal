@@ -20,9 +20,20 @@ const inter = Inter({
 
 export const metadata = {
   title: 'BanobagiNepal — Korean Beauty',
-  description: 'Authentic Korean medical beauty products for the Nepali market.',
-  other: {
-    'format-detection': 'telephone=no',
+  description: 'Authentic Korean medical-grade beauty products, carefully curated for the Nepali market.',
+  other: { 'format-detection': 'telephone=no' },
+  openGraph: {
+    title: 'BanobagiNepal — Korean Beauty',
+    description: 'Authentic Korean medical-grade beauty products for Nepal.',
+    url: 'https://banobaginepal.com',
+    siteName: 'BanobagiNepal',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'BanobagiNepal — Korean Beauty',
+    description: 'Authentic Korean medical-grade beauty products for Nepal.',
   },
 }
 
@@ -30,7 +41,7 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#6C3FE0',
+  themeColor: '#1A5C8A',
 }
 
 export default function RootLayout({ children }) {

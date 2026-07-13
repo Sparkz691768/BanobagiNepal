@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /account/
+
+Sitemap: https://banobaginepal.com/sitemap.xml

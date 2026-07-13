@@ -6,19 +6,27 @@ import { createServiceClient } from '@/lib/supabase'
 const MAX_MAIN_CATEGORIES = 2
 const MAX_SUB_CATEGORIES = 2
 
+const ALLOWED_PRODUCT_FIELDS = [
+  'name', 'description', 'price', 'original_price', 'stock',
+  'category_ids', 'images', 'is_featured', 'is_active', 'slug',
+]
+
 export async function GET(req, { params }) {
   try {
+    const session = await getServerSession(authOptions)
+    const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'employee'
+
     const supabase = createServiceClient()
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('id', params.id)
-      .maybeSingle()
+    let query = supabase.from('products').select('*').eq('id', params.id)
+
+    // Only admins/employees can see inactive products
+    if (!isAdmin) query = query.eq('is_active', true)
+
+    const { data, error } = await query.maybeSingle()
 
     if (error) throw error
     if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-    // attach categories
     const catIds = data.category_ids || []
     let categories = []
     if (catIds.length > 0) {
@@ -39,17 +47,24 @@ export async function PUT(req, { params }) {
     }
 
     const body = await req.json()
-    if (body.category_ids !== undefined) {
-      const categoryIds = Array.isArray(body.category_ids) ? Array.from(new Set(body.category_ids)) : []
-      body.category_ids = categoryIds
+
+    // Whitelist allowed fields to prevent mass assignment
+    const safeBody = Object.fromEntries(
+      Object.entries(body).filter(([key]) => ALLOWED_PRODUCT_FIELDS.includes(key))
+    )
+
+    if (safeBody.category_ids !== undefined) {
+      safeBody.category_ids = Array.isArray(safeBody.category_ids)
+        ? Array.from(new Set(safeBody.category_ids))
+        : []
     }
 
     const supabase = createServiceClient()
-    if (body.category_ids?.length > 0) {
+    if (safeBody.category_ids?.length > 0) {
       const { data: selectedCategories, error: categoryError } = await supabase
         .from('categories')
         .select('id, parent_id')
-        .in('id', body.category_ids)
+        .in('id', safeBody.category_ids)
 
       if (categoryError) throw categoryError
 
@@ -65,7 +80,7 @@ export async function PUT(req, { params }) {
 
     const { data, error } = await supabase
       .from('products')
-      .update(body)
+      .update(safeBody)
       .eq('id', params.id)
       .select()
       .single()
