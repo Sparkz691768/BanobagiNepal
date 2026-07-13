@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import { FiChevronLeft, FiChevronRight, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi'
 import { formatPrice, formatDate } from '@/lib/utils'
 import StarRating from '@/components/product/StarRating'
@@ -64,11 +63,11 @@ export default function ProductDetailClient({ product, initialReviews }) {
             onMouseLeave={() => setIsGalleryPaused(false)}
           >
             {images[selectedImage] ? (
-              <Image
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 src={images[selectedImage]}
                 alt={product.name}
-                fill
-                className="object-contain p-3"
+                style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', padding: '12px', display: 'block' }}
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-muted text-sm">
@@ -118,7 +117,8 @@ export default function ProductDetailClient({ product, initialReviews }) {
                     i === selectedImage ? 'border-primary' : 'border-gray-200'
                   }`}
                 >
-                  <Image src={img} alt="" fill className="object-contain p-1" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px', display: 'block' }} />
                 </button>
               ))}
             </div>

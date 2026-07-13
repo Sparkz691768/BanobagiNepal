@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { FiShoppingBag } from 'react-icons/fi'
 import { formatPrice } from '@/lib/utils'
 import StarRating from './StarRating'
@@ -27,16 +26,15 @@ export default function ProductCard({ product }) {
 
   return (
     <Link href={`/shop/${product.slug}`} className="group block">
-      {/* Image frame — fixed height on mobile, aspect-ratio on desktop. overflow-hidden clips everything. */}
+      {/* Image frame — guaranteed fixed frame, image always contained inside */}
       <div className="relative w-full overflow-hidden mb-3 bg-gray-50 border border-gray-100" style={{ height: 'clamp(160px, 45vw, 280px)' }}>
         {image ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={image}
             alt={product.name}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-contain object-center p-2 group-hover:scale-105 transition-transform duration-700 ease-out"
-            style={{ maxWidth: '100%', maxHeight: '100%' }}
+            className="w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out"
+            style={{ objectFit: 'contain', objectPosition: 'center', padding: '6px', display: 'block' }}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
