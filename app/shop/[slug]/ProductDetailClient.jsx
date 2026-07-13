@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { FiChevronLeft, FiChevronRight, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi'
-import { formatPrice, formatDate } from '@/lib/utils'
+import { formatPrice, formatDate, toSquareImage } from '@/lib/utils'
 import StarRating from '@/components/product/StarRating'
 import ReviewForm from '@/components/product/ReviewForm'
 import useCart from '@/hooks/useCart'
@@ -15,7 +15,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
   const [reviews, setReviews] = useState(initialReviews)
   const addItem = useCart((s) => s.addItem)
 
-  const images = product.images?.length ? product.images : []
+  const images = (product.images?.length ? product.images : []).map(toSquareImage)
   const discount =
     product.original_price && product.original_price > product.price
       ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
@@ -63,14 +63,12 @@ export default function ProductDetailClient({ product, initialReviews }) {
             onMouseLeave={() => setIsGalleryPaused(false)}
           >
             {images[selectedImage] ? (
-              <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center" style={{ padding: '12px' }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={images[selectedImage]}
-                  alt={product.name}
-                  style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }}
-                />
-              </div>
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={images[selectedImage]}
+                alt={product.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-muted text-sm">
                 No Image
@@ -119,10 +117,8 @@ export default function ProductDetailClient({ product, initialReviews }) {
                     i === selectedImage ? 'border-primary' : 'border-gray-200'
                   }`}
                 >
-                  <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center" style={{ padding: '4px' }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img} alt="" style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }} />
-                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 </button>
               ))}
             </div>

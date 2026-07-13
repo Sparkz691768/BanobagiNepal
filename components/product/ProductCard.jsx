@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { FiShoppingBag } from 'react-icons/fi'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, toSquareImage } from '@/lib/utils'
 import StarRating from './StarRating'
 import useCart from '@/hooks/useCart'
 import toast from 'react-hot-toast'
@@ -18,7 +18,7 @@ export default function ProductCard({ product }) {
     toast.success(`${product.name} added to cart`)
   }
 
-  const image = product.images?.[0]
+  const image = toSquareImage(product.images?.[0])
   const discount =
     product.original_price && product.original_price > product.price
       ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
@@ -29,12 +29,12 @@ export default function ProductCard({ product }) {
       {/* Image frame — guaranteed fixed frame, image always contained inside */}
       <div className="relative w-full overflow-hidden mb-3 bg-gray-50 border border-gray-100" style={{ height: 'clamp(160px, 45vw, 280px)' }}>
         {image ? (
-          <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-700 ease-out" style={{ padding: '6px' }}>
+          <div className="absolute top-0 left-0 right-0 bottom-0 group-hover:scale-105 transition-transform duration-700 ease-out">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={image}
               alt={product.name}
-              style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             />
           </div>
         ) : (
