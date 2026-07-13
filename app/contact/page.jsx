@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { FaInstagram, FaFacebook, FaTiktok } from 'react-icons/fa'
-import { FiClock, FiMail, FiMapPin, FiPhone, FiShoppingBag, FiTruck, FiUser } from 'react-icons/fi'
-import { createServiceClient } from '@/lib/supabase'
+import { FiClock, FiMail, FiMapPin, FiPhone } from 'react-icons/fi'
+import LocationsSection from './LocationsSection'
 
 const SOCIAL_LINKS = [
   {
@@ -35,75 +35,7 @@ export const metadata = {
   description: 'Get in touch with BanobagiNepal. Find us on Instagram, Facebook, TikTok, or send us a message.',
 }
 
-export const dynamic = 'force-dynamic'
-
-async function getContactSettings() {
-  try {
-    const supabase = createServiceClient()
-    const { data, error } = await supabase.from('settings').select('key, value')
-    if (error) throw error
-    const map = (data || []).reduce((r, row) => ({ ...r, [row.key]: row.value }), {})
-
-    let distributors = []
-    let stores = []
-
-    try { distributors = JSON.parse(map.distributors || '[]') } catch {}
-    try { stores = JSON.parse(map.stores || '[]') } catch {}
-
-    // Migrate legacy single-entry
-    if (distributors.length === 0 && map.distributor_name) {
-      distributors = [{ name: map.distributor_name, contact_person: map.distributor_contact_person, phone: map.distributor_phone, email: map.distributor_email, address: map.distributor_address, hours: map.distributor_hours }]
-    }
-    if (stores.length === 0 && map.store_name) {
-      stores = [{ name: map.store_name, contact_person: map.store_contact_person, phone: map.store_phone, email: map.store_email, address: map.store_address, hours: map.store_hours }]
-    }
-
-    return { distributors, stores }
-  } catch {
-    return { distributors: [], stores: [] }
-  }
-}
-
-function LocationCard({ entry, label, Icon }) {
-  const { name, contact_person, phone, email, address, hours } = entry
-  const details = [
-    { key: 'contact', icon: FiUser, value: contact_person },
-    { key: 'address', icon: FiMapPin, value: address },
-    { key: 'phone', icon: FiPhone, value: phone, href: phone ? `tel:${phone.replace(/\s/g, '')}` : '' },
-    { key: 'email', icon: FiMail, value: email, href: email ? `mailto:${email}` : '' },
-    { key: 'hours', icon: FiClock, value: hours },
-  ].filter((d) => d.value)
-
-  return (
-    <article className="bg-white border border-gray-200 p-6 sm:p-8 shadow-sm">
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-11 h-11 rounded-full bg-light-fill text-primary flex items-center justify-center">
-          <Icon size={21} />
-        </div>
-        <div>
-          <p className="text-[10px] tracking-[0.25em] uppercase text-muted">{label}</p>
-          <h3 className="font-display text-2xl text-dark">{name || label}</h3>
-        </div>
-      </div>
-      {details.length ? (
-        <div className="space-y-3">
-          {details.map(({ key, icon: DetailIcon, value, href }) => (
-            <div key={key} className="flex items-start gap-3 text-sm text-muted">
-              <DetailIcon className="mt-0.5 text-primary shrink-0" size={17} />
-              {href ? <a href={href} className="hover:text-primary transition-colors">{value}</a> : <span>{value}</span>}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-sm text-muted">Details will be updated soon.</p>
-      )}
-    </article>
-  )
-}
-
-export default async function ContactPage() {
-  const { distributors, stores } = await getContactSettings()
-
+export default function ContactPage() {
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
       {/* Header */}
@@ -120,30 +52,7 @@ export default async function ContactPage() {
           <p className="text-xs tracking-[0.3em] uppercase text-muted mb-2">Visit or Connect</p>
           <h2 className="font-display text-3xl sm:text-4xl font-light text-dark">Where to Find Us</h2>
         </div>
-        {(distributors.length > 0 || stores.length > 0) && (
-          <div className="space-y-8">
-            {distributors.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold tracking-widest uppercase text-muted mb-4">Authorized Distributors</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {distributors.map((entry, i) => (
-                    <LocationCard key={i} entry={entry} label="Authorized Distributor" Icon={FiTruck} />
-                  ))}
-                </div>
-              </div>
-            )}
-            {stores.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold tracking-widest uppercase text-muted mb-4">Physical Stores</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {stores.map((entry, i) => (
-                    <LocationCard key={i} entry={entry} label="Physical Store" Icon={FiShoppingBag} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+        <LocationsSection />
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -159,7 +68,7 @@ export default async function ContactPage() {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-start gap-4 p-5 border border-gray-200 bg-white group transition-all duration-200 hover:border-gray-400 hover:shadow-sm`}
+                className="flex items-start gap-4 p-5 border border-gray-200 bg-white group transition-all duration-200 hover:border-gray-400 hover:shadow-sm"
               >
                 <div className={`mt-0.5 text-gray-400 transition-colors duration-200 ${color} group-hover:scale-110 transition-transform`}>
                   <Icon size={24} />
