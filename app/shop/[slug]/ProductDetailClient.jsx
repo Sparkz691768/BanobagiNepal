@@ -67,7 +67,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
                 src={images[selectedImage]}
                 alt={product.name}
                 fill
-                className="object-contain p-2"
+                className="object-contain p-1"
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-muted text-sm">
