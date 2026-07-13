@@ -58,7 +58,8 @@ export default function ProductDetailClient({ product, initialReviews }) {
         {/* Images */}
         <div>
           <div
-            className="relative w-full aspect-square bg-gray-50 border border-gray-100 mb-4 overflow-hidden group/gallery"
+            className="relative w-full bg-gray-50 border border-gray-100 mb-4 overflow-hidden group/gallery"
+            style={{ height: 'min(100vw, 420px)' }}
             onMouseEnter={() => setIsGalleryPaused(true)}
             onMouseLeave={() => setIsGalleryPaused(false)}
           >
@@ -68,7 +69,6 @@ export default function ProductDetailClient({ product, initialReviews }) {
                 alt={product.name}
                 fill
                 className="object-contain p-3"
-                style={{ maxWidth: '100%', maxHeight: '100%' }}
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-muted text-sm">
@@ -106,7 +106,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
             )}
           </div>
           {images.length > 1 && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1">
               {images.map((img, i) => (
                 <button
                   key={i}
@@ -114,8 +114,8 @@ export default function ProductDetailClient({ product, initialReviews }) {
                   onClick={() => setSelectedImage(i)}
                   aria-label={`Show product image ${i + 1}`}
                   aria-current={i === selectedImage ? 'true' : undefined}
-                  className={`relative w-20 h-20 bg-gray-50 overflow-hidden border-2 transition-colors ${
-                    i === selectedImage ? 'border-primary' : 'border-transparent'
+                  className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 overflow-hidden border-2 transition-colors ${
+                    i === selectedImage ? 'border-primary' : 'border-gray-200'
                   }`}
                 >
                   <Image src={img} alt="" fill className="object-contain p-1" />

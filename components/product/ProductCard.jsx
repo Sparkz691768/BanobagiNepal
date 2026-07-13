@@ -27,8 +27,8 @@ export default function ProductCard({ product }) {
 
   return (
     <Link href={`/shop/${product.slug}`} className="group block">
-      {/* Image frame — strict square on mobile, 3/4 on desktop. overflow-hidden clips everything. */}
-      <div className="relative w-full aspect-square sm:aspect-[3/4] bg-gray-50 border border-gray-100 overflow-hidden mb-3 shrink-0">
+      {/* Image frame — fixed height on mobile, aspect-ratio on desktop. overflow-hidden clips everything. */}
+      <div className="relative w-full overflow-hidden mb-3 bg-gray-50 border border-gray-100" style={{ height: 'clamp(160px, 45vw, 280px)' }}>
         {image ? (
           <Image
             src={image}
