@@ -29,13 +29,14 @@ export default function ProductCard({ product }) {
       {/* Image frame — guaranteed fixed frame, image always contained inside */}
       <div className="relative w-full overflow-hidden mb-3 bg-gray-50 border border-gray-100" style={{ height: 'clamp(160px, 45vw, 280px)' }}>
         {image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={image}
-            alt={product.name}
-            className="w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out"
-            style={{ objectFit: 'contain', objectPosition: 'center', padding: '6px', display: 'block' }}
-          />
+          <div className="absolute inset-[6px] group-hover:scale-105 transition-transform duration-700 ease-out">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={image}
+              alt={product.name}
+              style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', display: 'block' }}
+            />
+          </div>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
             <span className="text-muted text-[10px] tracking-widest uppercase">No Image</span>

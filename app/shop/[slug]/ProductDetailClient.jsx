@@ -63,12 +63,14 @@ export default function ProductDetailClient({ product, initialReviews }) {
             onMouseLeave={() => setIsGalleryPaused(false)}
           >
             {images[selectedImage] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={images[selectedImage]}
-                alt={product.name}
-                style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', padding: '12px', display: 'block' }}
-              />
+              <div className="absolute inset-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={images[selectedImage]}
+                  alt={product.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', display: 'block' }}
+                />
+              </div>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-muted text-sm">
                 No Image
@@ -117,8 +119,10 @@ export default function ProductDetailClient({ product, initialReviews }) {
                     i === selectedImage ? 'border-primary' : 'border-gray-200'
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px', display: 'block' }} />
+                  <div className="absolute inset-1">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
+                  </div>
                 </button>
               ))}
             </div>
