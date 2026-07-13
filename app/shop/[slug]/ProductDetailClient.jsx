@@ -67,7 +67,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
                 src={images[selectedImage]}
                 alt={product.name}
                 fill
-                className="object-cover"
+                className="object-contain p-2"
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-muted text-sm">
@@ -117,7 +117,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
                     i === selectedImage ? 'border-primary' : 'border-transparent'
                   }`}
                 >
-                  <Image src={img} alt="" fill className="object-cover" />
+                  <Image src={img} alt="" fill className="object-contain p-1" />
                 </button>
               ))}
             </div>
