@@ -41,8 +41,32 @@ export async function POST(req) {
       shipping_notes,
     } = body
 
-    if (!items?.length) {
+    if (!Array.isArray(items) || !items.length || items.length > 50) {
       return NextResponse.json({ error: 'Invalid order data' }, { status: 400 })
+    }
+
+    // Quantities must be positive whole numbers (blocks negative / zero totals)
+    const productIdsSeen = new Set()
+    for (const item of items) {
+      if (
+        !item ||
+        typeof item.id !== 'string' ||
+        !Number.isInteger(item.quantity) ||
+        item.quantity < 1 ||
+        item.quantity > 100 ||
+        productIdsSeen.has(item.id)
+      ) {
+        return NextResponse.json({ error: 'Invalid order data' }, { status: 400 })
+      }
+      productIdsSeen.add(item.id)
+    }
+
+    // Keep shipping fields to sane lengths
+    const shippingFields = { shipping_name, shipping_email, shipping_phone, shipping_address, shipping_city, shipping_notes }
+    for (const value of Object.values(shippingFields)) {
+      if (value != null && (typeof value !== 'string' || value.length > 1000)) {
+        return NextResponse.json({ error: 'Invalid shipping details' }, { status: 400 })
+      }
     }
 
     const supabase = createServiceClient()
@@ -51,7 +75,7 @@ export async function POST(req) {
     const productIds = items.map((i) => i.id)
     const { data: products, error: productError } = await supabase
       .from('products')
-      .select('id, price, stock, is_active')
+      .select('id, name, price, stock, is_active')
       .in('id', productIds)
 
     if (productError) throw productError
@@ -74,10 +98,12 @@ export async function POST(req) {
       return sum + product.price * item.quantity
     }, 0)
 
-    // Build validated items with server-side prices
+    // Build validated items from server-side product data (same fields checkout sends)
     const validatedItems = items.map((item) => ({
-      ...item,
+      id: item.id,
+      name: productMap[item.id].name,
       price: productMap[item.id].price,
+      quantity: item.quantity,
     }))
 
     const { data: order, error } = await supabase

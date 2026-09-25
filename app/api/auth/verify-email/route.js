@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
 import { consumeToken } from '@/lib/tokens'
+import { isRateLimited, recordAttempt, clearAttempts } from '@/lib/rateLimit'
 
 /**
  * POST /api/auth/verify-email
@@ -16,11 +17,21 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Email and code are required' }, { status: 400 })
     }
 
-    // Validate OTP
-    const result = await consumeToken(otp.trim(), 'email_verification')
+    // Block brute-forcing the 6-digit code: max 5 wrong tries per 15 minutes
+    if (await isRateLimited(email, 'otp_verify', 5, 15)) {
+      return NextResponse.json(
+        { error: 'Too many incorrect attempts. Please request a new code.' },
+        { status: 429 }
+      )
+    }
+
+    // Validate OTP (bound to this email)
+    const result = await consumeToken(String(otp).trim(), 'email_verification', email)
     if (!result.valid) {
+      await recordAttempt(email, 'otp_verify', 15)
       return NextResponse.json({ error: result.reason }, { status: 400 })
     }
+    await clearAttempts(email, 'otp_verify')
     if (result.email !== email) {
       return NextResponse.json({ error: 'Code does not match this email' }, { status: 400 })
     }

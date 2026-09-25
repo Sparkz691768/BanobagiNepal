@@ -30,8 +30,11 @@ export async function POST(req) {
 
     const { product_id, rating, comment } = await req.json()
 
-    if (!product_id || !rating || rating < 1 || rating > 5) {
+    if (!product_id || !Number.isInteger(rating) || rating < 1 || rating > 5) {
       return NextResponse.json({ error: 'Invalid review data' }, { status: 400 })
+    }
+    if (comment != null && (typeof comment !== 'string' || comment.length > 2000)) {
+      return NextResponse.json({ error: 'Review is too long' }, { status: 400 })
     }
 
     const supabase = createServiceClient()

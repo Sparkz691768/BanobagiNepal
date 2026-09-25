@@ -10,6 +10,17 @@ export async function POST(req) {
 
     const { order_id, message, attachment_url } = await req.json()
     if (!order_id) return NextResponse.json({ error: 'order_id required' }, { status: 400 })
+    if (message != null && (typeof message !== 'string' || message.length > 2000)) {
+      return NextResponse.json({ error: 'Message too long' }, { status: 400 })
+    }
+    // Attachments may only be images uploaded through /api/upload (Cloudinary),
+    // never arbitrary links like javascript: URLs
+    if (
+      attachment_url &&
+      (typeof attachment_url !== 'string' || !attachment_url.startsWith('https://res.cloudinary.com/'))
+    ) {
+      return NextResponse.json({ error: 'Invalid attachment' }, { status: 400 })
+    }
 
     const supabase = createServiceClient()
 

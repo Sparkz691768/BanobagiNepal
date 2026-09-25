@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
 import { createToken } from '@/lib/tokens'
 import { sendPasswordResetEmail } from '@/lib/email'
+import { isRateLimited, recordAttempt } from '@/lib/rateLimit'
 
 /**
  * POST /api/auth/forgot-password
@@ -33,8 +34,14 @@ export async function POST(req) {
       return NextResponse.json({ success: true })
     }
 
+    // Prevent email bombing: max 5 reset emails per account per hour (still returns success)
+    if (await isRateLimited(email, 'reset_send', 5, 60)) {
+      return NextResponse.json({ success: true })
+    }
+
     const token = await createToken(email, 'password_reset', 30)
     await sendPasswordResetEmail(email, token, user.name)
+    await recordAttempt(email, 'reset_send', 60)
 
     return NextResponse.json({ success: true })
   } catch (err) {

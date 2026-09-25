@@ -22,7 +22,7 @@ export default withAuth(
       pathname.startsWith('/account') ||
       pathname.startsWith('/checkout')
     ) {
-      if (!token) {
+      if (!token || token.revoked) {
         return NextResponse.redirect(new URL('/login', req.url))
       }
     }

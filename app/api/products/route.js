@@ -7,6 +7,11 @@ import { slugify } from '@/lib/utils'
 const MAX_MAIN_CATEGORIES = 2
 const MAX_SUB_CATEGORIES = 2
 
+const ALLOWED_PRODUCT_FIELDS = [
+  'name', 'description', 'price', 'original_price', 'stock',
+  'category_ids', 'images', 'is_featured', 'is_active',
+]
+
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url)
@@ -85,7 +90,14 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await req.json()
+    const rawBody = await req.json()
+    // Whitelist fields so rating/review_count/id etc. can't be set directly
+    const body = Object.fromEntries(
+      Object.entries(rawBody || {}).filter(([key]) => ALLOWED_PRODUCT_FIELDS.includes(key))
+    )
+    if (!body.name || typeof body.name !== 'string') {
+      return NextResponse.json({ error: 'Name required' }, { status: 400 })
+    }
     const categoryIds = Array.isArray(body.category_ids) ? Array.from(new Set(body.category_ids)) : []
     const baseSlug = slugify(body.name)
 

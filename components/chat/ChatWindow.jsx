@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { FiSend, FiImage, FiCheck, FiX } from 'react-icons/fi'
 import toast from 'react-hot-toast'
-import { createAnonClient } from '@/lib/supabase'
 import ChatMessage from './ChatMessage'
 
 export default function ChatWindow({ orderId, orderStatus, onStatusChange }) {
@@ -23,46 +22,28 @@ export default function ChatWindow({ orderId, orderStatus, onStatusChange }) {
     if (!orderId) return
     fetchMessages()
 
-    const supabase = createAnonClient()
-    const channel = supabase
-      .channel('chat:' + orderId)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'chats',
-          filter: `order_id=eq.${orderId}`,
-        },
-        (payload) => {
-          setMessages((prev) => {
-            if (prev.find((m) => m.id === payload.new.id)) return prev
-            return [...prev, payload.new]
-          })
-        }
-      )
-      .subscribe()
-
-    const orderChannel = supabase
-      .channel('order:' + orderId)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'orders',
-          filter: `id=eq.${orderId}`,
-        },
-        (payload) => {
-          onStatusChange?.(payload.new.status, payload.new.payment_status)
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-      supabase.removeChannel(orderChannel)
+    // Poll the authorised API routes instead of subscribing with the public
+    // anon key (which would require exposing the database to the browser).
+    let lastStatus = null
+    async function pollOrder() {
+      const res = await fetch(`/api/orders/${orderId}`)
+      if (!res.ok) return
+      const order = await res.json()
+      const key = `${order.status}|${order.payment_status}`
+      if (lastStatus !== null && key !== lastStatus) {
+        onStatusChange?.(order.status, order.payment_status)
+      }
+      lastStatus = key
     }
+    pollOrder()
+
+    const interval = setInterval(() => {
+      if (document.hidden) return
+      fetchMessages()
+      pollOrder()
+    }, 5000)
+
+    return () => clearInterval(interval)
   }, [orderId])
 
   useEffect(() => {
@@ -73,7 +54,12 @@ export default function ChatWindow({ orderId, orderStatus, onStatusChange }) {
     const res = await fetch(`/api/chat/${orderId}`)
     if (res.ok) {
       const data = await res.json()
-      setMessages(data)
+      // Only update when something changed, so polling doesn't re-scroll the chat
+      setMessages((prev) =>
+        prev.length === data.length && prev[prev.length - 1]?.id === data[data.length - 1]?.id
+          ? prev
+          : data
+      )
     }
   }
 
@@ -88,6 +74,7 @@ export default function ChatWindow({ orderId, orderStatus, onStatusChange }) {
       })
       if (!res.ok) throw new Error('Failed to send')
       setText('')
+      fetchMessages()
     } catch {
       toast.error('Failed to send message')
     } finally {
@@ -121,6 +108,7 @@ export default function ChatWindow({ orderId, orderStatus, onStatusChange }) {
           }),
         })
         if (!res.ok) throw new Error('Failed to send image')
+        fetchMessages()
       }
       reader.readAsDataURL(file)
     } catch {
@@ -141,6 +129,7 @@ export default function ChatWindow({ orderId, orderStatus, onStatusChange }) {
       if (!res.ok) throw new Error('Failed')
       toast.success('Payment confirmed!')
       onStatusChange?.('confirmed', 'paid')
+      fetchMessages()
     } catch {
       toast.error('Failed to confirm payment')
     }
@@ -157,6 +146,7 @@ export default function ChatWindow({ orderId, orderStatus, onStatusChange }) {
       if (!res.ok) throw new Error('Failed')
       toast.success('Order cancelled')
       onStatusChange?.('cancelled', undefined)
+      fetchMessages()
     } catch {
       toast.error('Failed to cancel order')
     }

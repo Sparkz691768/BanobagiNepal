@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createServiceClient } from '@/lib/supabase'
+import { ORDER_STATUSES } from '@/lib/utils'
+
+const PAYMENT_STATUSES = ['unpaid', 'paid']
 
 export async function GET(req, { params }) {
   try {
@@ -38,6 +41,23 @@ export async function PATCH(req, { params }) {
 
     const body = await req.json()
     const updates = {}
+
+    if (body.status && !ORDER_STATUSES.includes(body.status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+    }
+    if (body.payment_status && !PAYMENT_STATUSES.includes(body.payment_status)) {
+      return NextResponse.json({ error: 'Invalid payment status' }, { status: 400 })
+    }
+    if (
+      body.delivery_fee !== undefined &&
+      (typeof body.delivery_fee !== 'number' || !Number.isFinite(body.delivery_fee) || body.delivery_fee < 0)
+    ) {
+      return NextResponse.json({ error: 'Invalid delivery fee' }, { status: 400 })
+    }
+    if (body._deliveryFeeMessage !== undefined &&
+      (typeof body._deliveryFeeMessage !== 'string' || body._deliveryFeeMessage.length > 1000)) {
+      return NextResponse.json({ error: 'Invalid message' }, { status: 400 })
+    }
 
     if (body.status) updates.status = body.status
     if (body.payment_status) updates.payment_status = body.payment_status

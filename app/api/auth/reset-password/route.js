@@ -11,7 +11,7 @@ export async function POST(req) {
   try {
     const { token, password, confirmPassword } = await req.json()
 
-    if (!token || !password) {
+    if (typeof token !== 'string' || typeof password !== 'string' || !token || !password) {
       return NextResponse.json({ error: 'Token and new password are required' }, { status: 400 })
     }
     if (password.length < 6) {
@@ -51,6 +51,6 @@ export async function POST(req) {
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error('reset-password error:', err)
-    return NextResponse.json({ error: err.message || 'Reset failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Reset failed. Please try again.' }, { status: 500 })
   }
 }

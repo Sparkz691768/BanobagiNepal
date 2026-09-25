@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { createServiceClient } from '@/lib/supabase'
 import { createToken } from '@/lib/tokens'
 import { sendOtpEmail } from '@/lib/email'
+import { isRateLimited, recordAttempt, clearAttempts } from '@/lib/rateLimit'
 
 /**
  * POST /api/auth/send-otp
@@ -26,6 +27,17 @@ export async function POST(req) {
     }
     if (password.length < 6) {
       return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 })
+    }
+    if (String(name).length > 100 || password.length > 128) {
+      return NextResponse.json({ error: 'Name or password is too long' }, { status: 400 })
+    }
+
+    // Prevent email bombing: max 5 codes per email per hour
+    if (await isRateLimited(email, 'otp_send', 5, 60)) {
+      return NextResponse.json(
+        { error: 'Too many codes requested. Please try again later.' },
+        { status: 429 }
+      )
     }
 
     const supabase = createServiceClient()
@@ -64,6 +76,8 @@ export async function POST(req) {
     })
 
     await sendOtpEmail(email, otp, name)
+    await recordAttempt(email, 'otp_send', 60)
+    await clearAttempts(email, 'otp_verify') // fresh code → fresh set of tries
 
     return NextResponse.json({ success: true })
   } catch (err) {
