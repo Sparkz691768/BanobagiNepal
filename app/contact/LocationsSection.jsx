@@ -3,6 +3,14 @@
 import { useState, useEffect } from 'react'
 import { FiClock, FiMail, FiMapPin, FiPhone, FiShoppingBag, FiTruck, FiUser } from 'react-icons/fi'
 
+// Skip blank entries left in the admin form (e.g. an unused "Add Store" card)
+function onlyFilledEntries(list) {
+  if (!Array.isArray(list)) return []
+  return list.filter(
+    (entry) => entry && Object.values(entry).some((v) => typeof v === 'string' && v.trim())
+  )
+}
+
 function LocationCard({ entry, label, Icon }) {
   const { name, contact_person, phone, email, address, hours } = entry
   const details = [
@@ -48,8 +56,8 @@ export default function LocationsSection() {
     fetch('/api/settings')
       .then((r) => r.json())
       .then((d) => {
-        try { setDistributors(JSON.parse(d.distributors || '[]')) } catch {}
-        try { setStores(JSON.parse(d.stores || '[]')) } catch {}
+        try { setDistributors(onlyFilledEntries(JSON.parse(d.distributors || '[]'))) } catch {}
+        try { setStores(onlyFilledEntries(JSON.parse(d.stores || '[]'))) } catch {}
       })
       .catch(() => {})
   }, [])

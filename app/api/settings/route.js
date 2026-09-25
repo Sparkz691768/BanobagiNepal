@@ -3,8 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createServiceClient } from '@/lib/supabase'
 
-// Keys readable by anyone (used in Navbar, TrustBar, etc.)
-const PUBLIC_KEYS = new Set(['announcement', 'free_shipping_amount'])
+// Keys readable by anyone (used in Navbar, TrustBar, Contact page locations)
+const PUBLIC_KEYS = ['announcement', 'free_shipping_amount', 'distributors', 'stores']
 
 const DEFAULTS = {
   distributors: '[]',
@@ -41,10 +41,7 @@ export async function GET(req) {
 
     // Non-admin callers only get public keys
     if (!isAdmin) {
-      return NextResponse.json({
-        announcement: result.announcement,
-        free_shipping_amount: result.free_shipping_amount,
-      })
+      return NextResponse.json(Object.fromEntries(PUBLIC_KEYS.map((key) => [key, result[key]])))
     }
 
     return NextResponse.json(result)
