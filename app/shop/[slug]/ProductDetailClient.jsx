@@ -57,7 +57,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
         {/* Images */}
         <div>
           <div
-            className="relative w-full bg-gray-50 border border-gray-100 mb-4 overflow-hidden group/gallery"
+            className="relative w-full bg-white border border-gray-100 mb-4 overflow-hidden group/gallery"
             style={{ height: 'min(100vw, 420px)' }}
             onMouseEnter={() => setIsGalleryPaused(true)}
             onMouseLeave={() => setIsGalleryPaused(false)}
@@ -67,7 +67,7 @@ export default function ProductDetailClient({ product, initialReviews }) {
               <img
                 src={images[selectedImage]}
                 alt={product.name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-muted text-sm">
@@ -113,12 +113,12 @@ export default function ProductDetailClient({ product, initialReviews }) {
                   onClick={() => setSelectedImage(i)}
                   aria-label={`Show product image ${i + 1}`}
                   aria-current={i === selectedImage ? 'true' : undefined}
-                  className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 overflow-hidden border-2 transition-colors ${
+                  className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-white overflow-hidden border-2 transition-colors ${
                     i === selectedImage ? 'border-primary' : 'border-gray-200'
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
                 </button>
               ))}
             </div>

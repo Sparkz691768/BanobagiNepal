@@ -11,9 +11,9 @@ export default function CartItem({ item }) {
 
   return (
     <div className="flex gap-4 py-4 border-b border-gray-100">
-      <div className="relative w-20 h-24 bg-gray-50 flex-shrink-0">
+      <div className="relative w-20 h-24 bg-white flex-shrink-0">
         {item.images?.[0] ? (
-          <Image src={item.images[0]} alt={item.name} fill className="object-cover" />
+          <Image src={item.images[0]} alt={item.name} fill className="object-contain" />
         ) : (
           <div className="absolute inset-0 bg-gray-100" />
         )}

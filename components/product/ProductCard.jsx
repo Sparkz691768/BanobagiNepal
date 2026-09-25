@@ -27,14 +27,14 @@ export default function ProductCard({ product }) {
   return (
     <Link href={`/shop/${product.slug}`} className="group block">
       {/* Image frame — guaranteed fixed frame, image always contained inside */}
-      <div className="relative w-full overflow-hidden mb-3 bg-gray-50 border border-gray-100" style={{ height: 'clamp(160px, 45vw, 280px)' }}>
+      <div className="relative w-full overflow-hidden mb-3 bg-white border border-gray-100" style={{ height: 'clamp(160px, 45vw, 280px)' }}>
         {image ? (
           <div className="absolute top-0 left-0 right-0 bottom-0 group-hover:scale-105 transition-transform duration-700 ease-out">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={image}
               alt={product.name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
             />
           </div>
         ) : (

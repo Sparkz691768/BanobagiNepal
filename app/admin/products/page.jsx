@@ -204,7 +204,7 @@ export default function AdminProductsPage() {
                 <td className="px-4 py-3">
                   <div className="relative w-12 h-12 bg-gray-100">
                     {product.images?.[0] && (
-                      <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
+                      <Image src={product.images[0]} alt={product.name} fill className="object-contain bg-white" />
                     )}
                   </div>
                 </td>
@@ -359,7 +359,7 @@ export default function AdminProductsPage() {
                 <div className="flex flex-wrap gap-2 mb-2">
                   {form.images.map((img, i) => (
                     <div key={i} className="relative w-16 h-16 group">
-                      <Image src={img} alt="" fill className="object-cover" />
+                      <Image src={img} alt="" fill className="object-contain bg-white" />
                       <button
                         type="button"
                         onClick={() => setForm((f) => ({ ...f, images: f.images.filter((_, idx) => idx !== i) }))}
