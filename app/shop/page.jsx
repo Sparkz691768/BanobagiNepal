@@ -1,7 +1,7 @@
 ﻿import { Suspense } from 'react'
 import ShopContent from './ShopContent'
 
-export const metadata = { title: 'Shop â€” BanobagiNepal' }
+export const metadata = { title: 'Shop — BanobagiNepal' }
 
 export default function ShopPage() {
   return (

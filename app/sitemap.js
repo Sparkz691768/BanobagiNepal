@@ -2,6 +2,9 @@ import { createServiceClient } from '@/lib/supabase'
 
 const BASE_URL = 'https://banobaginepal.com'
 
+// Regenerate hourly so new products appear without a redeploy
+export const revalidate = 3600
+
 export default async function sitemap() {
   const staticPages = [
     { url: BASE_URL, priority: 1.0 },
@@ -16,12 +19,12 @@ export default async function sitemap() {
     const supabase = createServiceClient()
     const { data: products } = await supabase
       .from('products')
-      .select('slug, updated_at')
+      .select('slug, created_at')
       .eq('is_active', true)
 
     const productPages = (products || []).map((p) => ({
       url: `${BASE_URL}/shop/${p.slug}`,
-      lastModified: new Date(p.updated_at),
+      lastModified: new Date(p.created_at),
       changeFrequency: 'weekly',
       priority: 0.8,
     }))

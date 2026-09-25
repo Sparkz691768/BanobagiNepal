@@ -32,7 +32,7 @@ export default function PromoBanner() {
             <h3 className="font-display text-4xl font-light text-white mb-3 leading-tight">Daily Sun<br />Shield</h3>
             <p className="text-sm text-white/60 mb-8 leading-relaxed max-w-xs">SPF 50+ PA++++ medical-grade UV protection for all skin types, year-round.</p>
             <Link
-              href="/shop?category=suncare"
+              href="/shop?category=sunscream"
               className="inline-flex items-center gap-3 text-xs font-semibold tracking-[0.2em] uppercase text-white border-b border-white/30 pb-1 hover:border-white transition-colors group/link"
             >
               Shop Suncare

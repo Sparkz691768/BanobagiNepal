@@ -1,15 +1,29 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { formatPrice } from '@/lib/utils'
 import useCart from '@/hooks/useCart'
 
-const FREE_SHIPPING = 2000
+const DEFAULT_FREE_SHIPPING = 2000
 
 export default function CartSummary() {
   const items = useCart((s) => s.items)
   const { data: session } = useSession()
+  // Use the threshold set in Admin → Settings (same source as the Trust Bar)
+  const [FREE_SHIPPING, setFreeShipping] = useState(DEFAULT_FREE_SHIPPING)
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((d) => {
+        const amount = Number(d.free_shipping_amount)
+        if (Number.isFinite(amount) && amount > 0) setFreeShipping(amount)
+      })
+      .catch(() => {})
+  }, [])
+
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
   const shippingFree = total >= FREE_SHIPPING
   const remaining = FREE_SHIPPING - total

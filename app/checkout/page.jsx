@@ -136,7 +136,7 @@ export default function CheckoutPage() {
               </div>
               <div className="bg-light-fill border border-blue-100 px-4 py-3 mb-4">
                 <p className="text-xs text-primary font-medium leading-relaxed">
-                  Payment via QR code â€” Our team will send you payment details in the chat after placing your order.
+                  Payment via QR code — Our team will send you payment details in the chat after placing your order.
                 </p>
               </div>
               <button

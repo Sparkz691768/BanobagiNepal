@@ -90,7 +90,7 @@ export default function LoginPage() {
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 error={errors.password}
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="••••••••"
               />
               <div className="flex justify-end mt-1">
                 <Link href="/forgot-password" className="text-xs text-primary hover:underline">
